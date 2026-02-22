@@ -5,8 +5,11 @@
   "private": true,
   "scripts": {
     "dev": "npx tsc --noEmit false --watch --outDir dist",
+    "build:watch": "tsc --noEmit false --watch --outDir dist --preserveWatchOutput",
+    "start:watch": "node --watch dist/src/app.js",
+    "dev:docker": "sh -c \"npm run build && (npm run build:watch & npm run start:watch)\"",
     "build": "tsc --noEmit false --outDir dist",
-    "start": "node dist/app.js",
+    "start": "node dist/src/app.js",
     "lint": "npx eslint .",
     "type-check": "tsc --noEmit",
     "docker:up": "docker compose up -d --build db backend prisma-studio",
