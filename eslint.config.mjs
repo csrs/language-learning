@@ -30,17 +30,20 @@ export default defineConfig(
 
   // Frontend TypeScript + React scope
   {
-    files: ["frontend/src/**/*.{ts,tsx}"],
+    files: ["frontend/**/*.{ts,tsx}"],
     languageOptions: {
       parserOptions: {
         project: "./frontend/tsconfig.json",
       },
     },
+    rules: {
+      "no-console": "warn",
+    },
   },
 
   // Backend TypeScript scope
   {
-    files: ["backend/src/**/*.ts"],
+    files: ["backend/**/*.ts"],
     languageOptions: {
       parserOptions: {
         project: "./backend/tsconfig.json",

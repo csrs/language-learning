@@ -4,11 +4,18 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
+    "dev": "npx tsc --noEmit false --watch --outDir dist",
+    "build": "tsc --noEmit false --outDir dist",
+    "start": "node dist/app.js",
     "lint": "npx eslint .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "docker:up": "docker compose up -d --build db backend prisma-studio",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f db backend prisma-studio"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
@@ -16,6 +23,8 @@
     "@vitejs/plugin-react": "^5.1.4",
     "eslint": "^9.39.2",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.55.0"
+    "typescript-eslint": "^8.55.0",
+    "@types/pg": "^8.16.0",
+    "prisma": "^7.3.0"
   }
 }
