@@ -6,7 +6,7 @@
 ### How to connect to the DB in Docker
 
 1. `cd backend`
-2. `docker compose up db`
+2. `docker compose up db backend`
 3. Go to the DB tab in VSCode and connect with these credentials:
 
 - Port: 5435

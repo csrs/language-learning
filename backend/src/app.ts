@@ -1,14 +1,20 @@
-import * as http from "http";
+import express from "express";
+import bodyParser from "body-parser";
+import { routerGet, routerPost } from "./routes/admin.ts";
 
-const port = Number(process.env.PORT ?? 3000);
+const app = express();
+const port = 3000;
 
-const server = http.createServer((req, res) => {
-  const path = req.url ?? "/";
+app.use(bodyParser.urlencoded({ extended: false }));
 
-  res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(JSON.stringify({ status: "ok", path }));
+app.use(routerGet);
+
+app.use(routerPost);
+
+// 404 page
+app.use((req, res, next) => {
+  res.status(404);
+  res.send("<h1>Page not found</h1>");
 });
 
-server.listen(port, () => {
-  console.log(`Backend listening on port ${port}`);
-});
+app.listen(port, () => {});
