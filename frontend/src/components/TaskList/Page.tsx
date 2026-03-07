@@ -1,31 +1,41 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Form } from "./Form";
 import { TaskList } from "./TaskList";
-import type { PriorityEnum, Task } from "./TaskItem";
+import { PriorityEnum, type Task } from "./TaskItem";
 import { StatusEnum } from "./TaskItem";
+import { CheckboxFilterList } from "./CheckboxFilterList";
 
 export const Page = () => {
   const [allTasks, setAllTasks] = useState<Task[]>([]);
-  const [filterLevel, setFilterLevel] = useState<
-    StatusEnum | PriorityEnum | undefined
-  >(undefined);
+  const [filterLevels, setFilterLevels] = useState<
+    (StatusEnum | PriorityEnum)[]
+  >([]);
 
-  const handleFiltering = (filterLevel?: StatusEnum | PriorityEnum) => {
-    if (!filterLevel) {
-      setFilterLevel(undefined);
+  const handleFiltering = (
+    isChecked: boolean,
+    newFilter?: StatusEnum | PriorityEnum,
+  ) => {
+    if (!newFilter) {
+      setFilterLevels(undefined);
     } else {
-      setFilterLevel(filterLevel);
+      if (isChecked) {
+        setFilterLevels((prev) => [...prev, newFilter]);
+      } else {
+        const newFilters = filterLevels.filter((f) => f !== newFilter);
+        setFilterLevels(newFilters);
+      }
     }
   };
 
-  const getFilteredTasks = (filterLevel: StatusEnum | PriorityEnum) => {
-    return allTasks.filter(
-      (t) => t.status === filterLevel || t.priority === filterLevel,
-    );
-  };
-
   const visibleTasks =
-    filterLevel === undefined ? allTasks : getFilteredTasks(filterLevel);
+    filterLevels.length === 0
+      ? allTasks
+      : allTasks.filter(
+          (t) =>
+            filterLevels.includes(t.status) ||
+            filterLevels.includes(t.priority),
+        );
+
   return (
     <>
       <h2>Form</h2>
@@ -34,11 +44,22 @@ export const Page = () => {
       />
       <h2>List of all tasks</h2>
       <TaskList tasks={visibleTasks} />
-      <button onClick={() => handleFiltering()}>View all tasks </button>
-      {/* // todo: add radio buttons or a dropdown so you can filter/sort by any of the available statuses and priorities */}
-      <button onClick={() => handleFiltering(StatusEnum.DONE)}>
-        View tasks filtered by: Status "done"
-      </button>
+      <h2>Filter by completion status: </h2>
+      <CheckboxFilterList
+        filterSet={Object.values(StatusEnum)}
+        typeOfFilter="status"
+        onSelectCheckbox={(filterLevel: StatusEnum, isChecked: boolean) =>
+          handleFiltering(isChecked, filterLevel)
+        }
+      />
+
+      <CheckboxFilterList
+        filterSet={Object.values(PriorityEnum)}
+        typeOfFilter="priority"
+        onSelectCheckbox={(filterLevel: PriorityEnum, isChecked: boolean) =>
+          handleFiltering(isChecked, filterLevel)
+        }
+      />
     </>
   );
 };

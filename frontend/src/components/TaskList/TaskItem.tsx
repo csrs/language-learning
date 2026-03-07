@@ -23,7 +23,7 @@ export const TaskItem = ({ task }: { task: Task }) => {
   return (
     <li>
       <p>
-        {`Title: ${task.title}, Description: ${task.description}, Created at: ${task.createdAt}, Priority: ${task.priority}, Status: ${task.status}`}{" "}
+        {`Title: ${task.title}, Description: ${task.description}, Priority: ${task.priority}, Status: ${task.status}`}{" "}
       </p>
     </li>
   );

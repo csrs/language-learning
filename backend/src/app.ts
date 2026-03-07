@@ -12,7 +12,7 @@ app.use(routerGet);
 app.use(routerPost);
 
 // 404 page
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404);
   res.send("<h1>Page not found</h1>");
 });
