@@ -12,7 +12,7 @@
     "sourceMap": true,
     "jsx": "react-jsx",
     "types": ["vitest/globals"],
-    "lib": ["DOM", "ES2016", "DOM.Iterable"],
+    "lib": ["DOM", "ES2017", "DOM.Iterable"],
     "skipLibCheck": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true

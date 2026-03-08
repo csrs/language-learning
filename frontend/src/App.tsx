@@ -1,58 +1,27 @@
-import "./App.css";
-import { useState } from "react";
-import { QuestionGroup } from "./components/QuestionGroup";
-import { AllQuestions } from "./components/AllQuestions";
-import { Instructions } from "./components/Instructions";
-import { QuestionSetType } from "./types/questionAnswerTypes";
+import { NavLink, Route, Routes } from "react-router";
+import { MemoryGame } from "./components/MemoryGame/MemoryGame";
+import { Quiz } from "./components/Quiz/Quiz";
+import { TasksAndForm } from "./components/TaskList/TasksAndForm";
+import { Home } from "./components/Home/Home";
 
 function App() {
-  const [selectedOption, setSelectedOption] = useState<QuestionSetType>(
-    QuestionSetType.Random,
-  );
-
-  const handleOptionChange = (value: QuestionSetType) => {
-    setSelectedOption(value);
-  };
-
   return (
-    <div className="container">
-      <form>
-        <div>
-          <input
-            required
-            type="radio"
-            id="randomQuestions"
-            name="toggle"
-            value={QuestionSetType.Random}
-            checked={selectedOption === QuestionSetType.Random}
-            onChange={() => handleOptionChange(QuestionSetType.Random)}
-          />
-          <label htmlFor="randomQuestions">33 Random Questions</label>
-        </div>
-        <div>
-          <input
-            required
-            type="radio"
-            id="allQuestions"
-            name="toggle"
-            value={QuestionSetType.All}
-            checked={selectedOption === QuestionSetType.All}
-            onChange={() => handleOptionChange(QuestionSetType.All)}
-          />
-          <label htmlFor="allQuestions">All Questions</label>
-        </div>
-      </form>
-      {selectedOption === QuestionSetType.All ? (
-        <>
-          <Instructions allQuestionsMode />
-          <AllQuestions />
-        </>
-      ) : (
-        <>
-          <Instructions allQuestionsMode={false} />
-          <QuestionGroup />
-        </>
-      )}
+    <div>
+      <nav style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/memory-game">
+          Countries + Capital Cities Memory Game
+        </NavLink>
+        <NavLink to="/tasks-and-form">Todo List Maker</NavLink>
+        <NavLink to="/quiz">Einbürgerungs Quiz</NavLink>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/memory-game" element={<MemoryGame />} />
+        <Route path="/tasks-and-form" element={<TasksAndForm />} />
+        <Route path="/quiz" element={<Quiz />} />
+      </Routes>
     </div>
   );
 }
