@@ -1,7 +1,7 @@
-import { type Question as QuestionType } from "../types/questionAnswerTypes";
+import { type Question as QuestionType } from "./types/questionAnswerTypes";
 
-import "./../App.css";
-import { GREEN, YELLOW } from "../consts/colors";
+import "./App.css";
+import { GREEN, YELLOW } from "./consts/colors";
 
 export const Question = ({
   question,
@@ -26,7 +26,8 @@ export const Question = ({
           }}
         >
           <strong>
-            Question #{question.id + 1}: {question.question}
+            <span style={{ color: "red" }}>* </span>
+            {`Question #${question.id + 1}: ${question.question}`}
           </strong>
           {question.image && (
             <img src={question.image} style={{ width: "200px" }} />

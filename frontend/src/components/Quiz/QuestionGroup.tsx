@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { mainQuestions } from "../consts/questions";
+import { mainQuestions } from "./consts/questions.ts";
 import {
   type QuestionAnswerKey,
   type Storage,
-} from "../types/questionAnswerTypes";
+} from "./types/questionAnswerTypes.ts";
 import {
   chooseRandomQuestions,
   isSessionStorageAvailable,
-} from "../utils/questionAnswerUtils.ts";
-import "./../App.css";
-import { GREEN, YELLOW } from "../consts/colors.ts";
+} from "./utils/questionAnswerUtils.ts";
+import "./App.css";
+import { GREEN, YELLOW } from "./consts/colors.ts";
 import { Question } from "./Question.tsx";
 
 export const QuestionGroup = () => {
@@ -119,7 +119,7 @@ export const QuestionGroup = () => {
       <form onSubmit={handleSubmit} onReset={handleReset}>
         <fieldset>
           <legend>
-            33 Questions. Hidden questions:
+            2 Questions. Hidden questions:
             <span style={{ marginLeft: "5px" }}>
               {omittedQuestions
                 .map((q) => q + 1)

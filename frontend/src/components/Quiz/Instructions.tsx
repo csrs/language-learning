@@ -41,10 +41,6 @@ export const Instructions = ({
                 yellow.
               </li>
               <li>
-                Click "New questions" to get a set of 33 more randomly chosen
-                questions.
-              </li>
-              <li>
                 If you correctly answer the same question 3 times, it won't
                 appear again. This is kept track of in your browser's Session
                 Storage (if your browser allows it).
