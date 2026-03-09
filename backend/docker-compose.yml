@@ -36,7 +36,12 @@ services:
       - /app/node_modules
     ports:
       - "${BACKEND_PORT:-3000}:3000"
-    command: ["npm", "run", "dev:docker"]
+    command:
+      [
+        "sh",
+        "-c",
+        "if [ ! -x node_modules/.bin/tsx ] || [ ! -f node_modules/express/package.json ]; then npm ci --include=dev; fi; if [ ! -f node_modules/.prisma/client/default.d.ts ]; then npx prisma generate; fi; npm run dev:docker",
+      ]
 
   prisma-studio:
     build:
@@ -48,14 +53,18 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5435/${POSTGRES_DB}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
     volumes:
       - ./:/app
       - /app/node_modules
     ports:
       - "5555:5555"
     command:
-      ["npx", "prisma", "studio", "--hostname", "0.0.0.0", "--port", "5555"]
+      [
+        "sh",
+        "-c",
+        "if [ ! -x node_modules/.bin/prisma ]; then npm ci --include=dev; fi; if [ ! -f node_modules/.prisma/client/default.d.ts ]; then npx prisma generate; fi; npx prisma studio --hostname 0.0.0.0 --port 5555",
+      ]
 
 volumes:
   postgres_data:
