@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../prisma/prisma.js", () => ({
   prisma: {
@@ -13,29 +13,42 @@ vi.mock("../../prisma/prisma.js", () => ({
 import { prisma } from "../../prisma/prisma.js";
 import {
   clearExpiredSessions,
-  createSession,
-  deleteSession,
+  createSessionInDatabase,
   getSessionCookieOptions,
   getSessionIdFromCookieHeader,
+  getHashedString,
   getUserIdFromSession,
   SESSION_COOKIE_NAME,
+  deleteStoredSessionFromDatabase,
 } from "./session.js";
 
 const prismaMock = vi.mocked(prisma, { deep: true });
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24;
+const previousSessionSecret = process.env.SESSION_SECRET_KEY;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  process.env.SESSION_SECRET_KEY = "test-session-secret";
   prismaMock.session.create.mockResolvedValue({} as never);
   prismaMock.session.findUnique.mockResolvedValue(null as never);
   prismaMock.session.deleteMany.mockResolvedValue({ count: 0 } as never);
 });
 
-describe("createSession", () => {
-  it("creates a session record", async () => {
-    const sessionId = await createSession(42, 1_000);
+afterEach(() => {
+  if (previousSessionSecret === undefined) {
+    delete process.env.SESSION_SECRET_KEY;
+    return;
+  }
 
-    expect(sessionId).toMatch(/^[0-9a-f]+$/i);
+  process.env.SESSION_SECRET_KEY = previousSessionSecret;
+});
+
+describe("createSessionInDatabase", () => {
+  it("returns the raw session id and stores only the hashed session id", async () => {
+    const sessionId = await createSessionInDatabase(42, 1_000);
+    const storedSessionId = getHashedString(sessionId);
+
+    expect(sessionId).toMatch(/^[0-9a-f]{64}$/i);
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
       where: {
         expiresAt: {
@@ -47,11 +60,12 @@ describe("createSession", () => {
 
     expect(prismaMock.session.create).toHaveBeenCalledWith({
       data: {
-        id: sessionId,
+        id: storedSessionId,
         userId: 42,
         expiresAt: new Date(1_000 + SESSION_TTL_MS),
       },
     });
+    expect(storedSessionId).not.toBe(sessionId);
   });
 });
 
@@ -76,14 +90,14 @@ describe("getUserIdFromSession", () => {
     ).resolves.toBeNull();
 
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
-      where: { id: "abc123" },
+      where: { id: getHashedString("abc123") },
     });
   });
 });
 
-describe("deleteSession", () => {
+describe("deleteStoredSessionFromDatabase", () => {
   it("deletes a session", async () => {
-    await deleteSession("abc123");
+    await deleteStoredSessionFromDatabase("abc123");
 
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
       where: { id: "abc123" },

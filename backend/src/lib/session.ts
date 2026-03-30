@@ -1,42 +1,55 @@
+import "dotenv/config";
 import { randomBytes } from "node:crypto";
 
 import type { CookieOptions } from "express";
 import { prisma } from "../../prisma/prisma.js";
+import { createHmac } from "node:crypto";
 
 export const SESSION_COOKIE_NAME = "sessionId";
 
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24;
 const getSessionExpiryDate = (now: number) => new Date(now + SESSION_TTL_MS);
 
-export const createSession = async (
+export const getHashedString = (inputString: string) => {
+  const secret = process.env.SESSION_SECRET_KEY;
+
+  if (!secret) {
+    throw new Error("SESSION_SECRET_KEY is required");
+  }
+
+  return createHmac("sha256", secret).update(inputString).digest("hex");
+};
+
+export const createSessionInDatabase = async (
   userId: number,
   now = Date.now(),
 ): Promise<string> => {
   await clearExpiredSessions(now);
 
-  const sessionId = randomBytes(32).toString("hex");
-  // todo: hash the sessionId, so that in the DB it's different than what's in the user's cookie
+  const rawSessionId = randomBytes(32).toString("hex");
+  const storedSessionId = getHashedString(rawSessionId);
   await prisma.session.create({
     data: {
-      id: sessionId,
+      id: storedSessionId,
       userId,
       expiresAt: getSessionExpiryDate(now),
     },
   });
 
-  return sessionId;
+  return rawSessionId;
 };
 
 export const getUserIdFromSession = async (
-  sessionId: string | null,
+  rawSessionId: string | null,
   now = Date.now(),
 ): Promise<number | null> => {
-  if (!sessionId) {
+  if (!rawSessionId) {
     return null;
   }
 
+  const storedSessionId = getHashedString(rawSessionId);
   const session = await prisma.session.findUnique({
-    where: { id: sessionId },
+    where: { id: storedSessionId },
     select: {
       userId: true,
       expiresAt: true,
@@ -48,25 +61,37 @@ export const getUserIdFromSession = async (
   }
 
   if (session.expiresAt.getTime() <= now) {
-    await deleteSession(sessionId);
+    await deleteStoredSessionFromDatabase(storedSessionId);
     return null;
   }
 
   return session.userId;
 };
 
-export const deleteSession = async (
-  sessionId: string | null,
+export const deleteStoredSessionFromDatabase = async (
+  storedSessionId: string | null,
 ): Promise<void> => {
-  if (!sessionId) {
+  if (!storedSessionId) {
     return;
   }
 
   await prisma.session.deleteMany({
-    where: { id: sessionId },
+    where: { id: storedSessionId },
   });
 };
 
+export const deleteRawSessionFromDatabase = async (
+  rawSessionId: string | null,
+): Promise<void> => {
+  if (!rawSessionId) {
+    return;
+  }
+  const storedSessionId = getHashedString(rawSessionId);
+
+  await deleteStoredSessionFromDatabase(storedSessionId);
+};
+
+// this is the raw (non-hashed) sessionId
 export const getSessionIdFromCookieHeader = (
   cookieHeader: string | undefined,
 ): string | null => {

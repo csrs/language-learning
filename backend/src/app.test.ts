@@ -64,7 +64,7 @@ afterEach(async () => {
   consoleErrorSpy.mockRestore();
 });
 
-describe("POST /api/user/create", () => {
+describe("POST /api/auth/register", () => {
   it("creates a user with a normalized email and hashed password", async () => {
     prismaMock.user.create.mockResolvedValueOnce({
       id: 1,
@@ -72,7 +72,7 @@ describe("POST /api/user/create", () => {
       email: "ada@example.com",
     } as never);
 
-    const response = await postJson("/api/user/create", {
+    const response = await postJson("/api/auth/register", {
       username: " Ada ",
       email: " ADA@example.com ",
       password: "super-secret",
@@ -107,7 +107,7 @@ describe("POST /api/user/create", () => {
   });
 
   it("returns 400 when a required field is missing", async () => {
-    const response = await postJson("/api/user/create", {
+    const response = await postJson("/api/auth/register", {
       username: "Ada",
       email: "ada@example.com",
     });
@@ -130,7 +130,7 @@ describe("POST /api/user/create", () => {
       }),
     );
 
-    const response = await postJson("/api/user/create", {
+    const response = await postJson("/api/auth/register", {
       username: "Ada",
       email: "ada@example.com",
       password: "super-secret",
@@ -145,7 +145,7 @@ describe("POST /api/user/create", () => {
   it("returns 500 when user creation throws an unexpected error", async () => {
     prismaMock.user.create.mockRejectedValueOnce(new Error("database offline"));
 
-    const response = await postJson("/api/user/create", {
+    const response = await postJson("/api/auth/register", {
       username: "Ada",
       email: "ada@example.com",
       password: "super-secret",
@@ -280,7 +280,7 @@ describe("POST /api/auth/login", () => {
   });
 });
 
-describe("session routes", () => {
+describe("me routes", () => {
   it("returns the logged-in user for a valid session cookie", async () => {
     prismaMock.user.findUnique
       .mockResolvedValueOnce({
@@ -305,7 +305,7 @@ describe("session routes", () => {
     });
     const sessionCookie = getRequiredSessionCookie(loginResponse);
 
-    const meResponse = await fetch(`${baseUrl}/api/auth/me`, {
+    const meResponse = await fetch(`${baseUrl}/api/me`, {
       headers: {
         Cookie: sessionCookie,
       },
@@ -327,12 +327,45 @@ describe("session routes", () => {
     });
   });
 
-  it("returns 401 for /api/auth/me without a session cookie", async () => {
-    const response = await fetch(`${baseUrl}/api/auth/me`);
+  it("returns 401 for GET /api/me without a session cookie", async () => {
+    const response = await fetch(`${baseUrl}/api/me`);
 
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({
       error: "Not authenticated",
+    });
+  });
+
+  it("returns 501 for PATCH /api/me", async () => {
+    const response = await fetch(`${baseUrl}/api/me`, {
+      method: "PATCH",
+    });
+
+    expect(response.status).toBe(501);
+    await expect(response.json()).resolves.toEqual({
+      error: "Not implemented",
+    });
+  });
+
+  it("returns 501 for DELETE /api/me", async () => {
+    const response = await fetch(`${baseUrl}/api/me`, {
+      method: "DELETE",
+    });
+
+    expect(response.status).toBe(501);
+    await expect(response.json()).resolves.toEqual({
+      error: "Not implemented",
+    });
+  });
+
+  it("returns 501 for PATCH /api/me/edit-password", async () => {
+    const response = await fetch(`${baseUrl}/api/me/edit-password`, {
+      method: "PATCH",
+    });
+
+    expect(response.status).toBe(501);
+    await expect(response.json()).resolves.toEqual({
+      error: "Not implemented",
     });
   });
 

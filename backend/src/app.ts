@@ -4,8 +4,8 @@ import express, {
   type Response,
 } from "express";
 
-import { router as authRouter } from "./routes/auth.js";
-import { router as userRouter } from "./routes/user.js";
+import { router as authRouter } from "./routes/auth.ts";
+import { router as meRouter } from "./routes/me.ts";
 
 export const createApp = () => {
   const app = express();
@@ -13,7 +13,7 @@ export const createApp = () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
-  app.use("/api/user", userRouter);
+  app.use("/api/me", meRouter);
   app.use("/api/auth", authRouter);
 
   app.use((req, res) => {
@@ -24,6 +24,7 @@ export const createApp = () => {
 
   app.use(
     (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+      void _next;
       console.error(error);
       res.status(500).json({ error: "Internal server error" });
     },
