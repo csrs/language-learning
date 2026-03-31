@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["strictUndefinedChecks"] // https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/null-and-undefined
 }
 
 datasource db {

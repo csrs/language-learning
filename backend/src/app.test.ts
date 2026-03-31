@@ -18,6 +18,8 @@ vi.mock("../prisma/prisma.js", () => ({
     user: {
       create: vi.fn(),
       findUnique: vi.fn(),
+      update: vi.fn(),
+      deleteMany: vi.fn(),
     },
   },
 }));
@@ -33,6 +35,8 @@ beforeEach(async () => {
   prismaMock.session.create.mockResolvedValue({} as never);
   prismaMock.session.findUnique.mockResolvedValue(null as never);
   prismaMock.session.deleteMany.mockResolvedValue({ count: 0 } as never);
+  prismaMock.user.update.mockResolvedValue({} as never);
+  prismaMock.user.deleteMany.mockResolvedValue({ count: 0 } as never);
   consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
   server = createApp().listen(0, "127.0.0.1");
@@ -203,7 +207,7 @@ describe("POST /api/auth/login", () => {
 
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({
-      error: "email and password are required",
+      error: "email and/or password are missing or incorrect",
     });
     expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
   });
@@ -218,7 +222,7 @@ describe("POST /api/auth/login", () => {
 
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({
-      error: "Invalid email or password",
+      error: "Invalid email and/or password",
     });
   });
 
@@ -237,7 +241,7 @@ describe("POST /api/auth/login", () => {
 
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({
-      error: "Invalid email or password",
+      error: "Invalid email and/or password",
     });
   });
 
@@ -336,36 +340,226 @@ describe("me routes", () => {
     });
   });
 
-  it("returns 501 for PATCH /api/me", async () => {
+  it("returns 401 for PATCH /api/me without a session cookie", async () => {
     const response = await fetch(`${baseUrl}/api/me`, {
       method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: "Ada",
+      }),
     });
 
-    expect(response.status).toBe(501);
+    expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({
-      error: "Not implemented",
+      error: "Not authenticated",
     });
   });
 
-  it("returns 501 for DELETE /api/me", async () => {
+  it("updates the username when email is omitted", async () => {
+    prismaMock.session.findUnique.mockResolvedValueOnce({
+      userId: 7,
+      expiresAt: new Date(Date.now() + 60_000),
+    } as never);
+    prismaMock.user.update.mockResolvedValueOnce({
+      id: 7,
+      username: "NewAda",
+      email: "ada@example.com",
+    } as never);
+
+    const response = await fetch(`${baseUrl}/api/me`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `${SESSION_COOKIE_NAME}=session-token`,
+      },
+      body: JSON.stringify({
+        username: "NewAda",
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      id: 7,
+      username: "NewAda",
+      email: "ada@example.com",
+    });
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: 7 },
+      data: {
+        username: "NewAda",
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
+    });
+  });
+
+  it("updates the email when username is omitted", async () => {
+    prismaMock.session.findUnique.mockResolvedValueOnce({
+      userId: 7,
+      expiresAt: new Date(Date.now() + 60_000),
+    } as never);
+    prismaMock.user.update.mockResolvedValueOnce({
+      id: 7,
+      username: "Ada",
+      email: "previous@example.com",
+    } as never);
+
+    const response = await fetch(`${baseUrl}/api/me`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `${SESSION_COOKIE_NAME}=session-token`,
+      },
+      body: JSON.stringify({
+        email: "new@example.com",
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: 7 },
+      data: {
+        email: "new@example.com",
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
+    });
+  });
+
+  it("returns 400 for PATCH /api/me when no fields are provided", async () => {
+    const response = await fetch(`${baseUrl}/api/me`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      fieldErrors: {},
+      formErrors: ["At least one of username or email must be provided"],
+    });
+    expect(prismaMock.user.update).not.toHaveBeenCalled();
+  });
+
+  it("returns 401 for DELETE /api/me without a session cookie", async () => {
     const response = await fetch(`${baseUrl}/api/me`, {
       method: "DELETE",
     });
 
-    expect(response.status).toBe(501);
+    expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({
-      error: "Not implemented",
+      error: "Not authenticated",
     });
   });
 
-  it("returns 501 for PATCH /api/me/edit-password", async () => {
-    const response = await fetch(`${baseUrl}/api/me/edit-password`, {
+  it("returns 400 for PATCH /api/me/password when password is missing", async () => {
+    const response = await fetch(`${baseUrl}/api/me/password`, {
       method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
     });
 
-    expect(response.status).toBe(501);
+    expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({
-      error: "Not implemented",
+      fieldErrors: {
+        password: ["Invalid input: expected string, received undefined"],
+      },
+      formErrors: [],
+    });
+    expect(prismaMock.user.update).not.toHaveBeenCalled();
+  });
+
+  it("updates the password and returns the public user for PATCH /api/me/password", async () => {
+    prismaMock.session.findUnique.mockResolvedValueOnce({
+      userId: 7,
+      expiresAt: new Date(Date.now() + 60_000),
+    } as never);
+    prismaMock.user.update.mockResolvedValueOnce({
+      id: 7,
+      username: "Ada",
+      email: "ada@example.com",
+    } as never);
+
+    const response = await fetch(`${baseUrl}/api/me/password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `${SESSION_COOKIE_NAME}=session-token`,
+      },
+      body: JSON.stringify({
+        password: "new-password",
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      id: 7,
+      username: "Ada",
+      email: "ada@example.com",
+    });
+
+    const updateArgs = prismaMock.user.update.mock.calls.at(-1)?.[0];
+
+    expect(updateArgs).toMatchObject({
+      where: { id: 7 },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
+    });
+    expect(updateArgs?.data.password_hash).toMatch(
+      /^scrypt:[0-9a-f]+:[0-9a-f]+$/i,
+    );
+    expect(updateArgs?.data.password_hash).not.toBe("new-password");
+  });
+
+  it("returns 401 for PATCH /api/me/password without a session cookie", async () => {
+    const response = await fetch(`${baseUrl}/api/me/password`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        password: "correct-password",
+      }),
+    });
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toEqual({
+      error: "Not authenticated",
+    });
+  });
+
+  it("returns 204 for DELETE /api/me with a valid session cookie", async () => {
+    prismaMock.session.findUnique.mockResolvedValueOnce({
+      userId: 7,
+      expiresAt: new Date(Date.now() + 60_000),
+    } as never);
+    prismaMock.user.deleteMany.mockResolvedValueOnce({ count: 1 } as never);
+
+    const response = await fetch(`${baseUrl}/api/me`, {
+      method: "DELETE",
+      headers: {
+        Cookie: `${SESSION_COOKIE_NAME}=session-token`,
+      },
+    });
+
+    expect(response.status).toBe(204);
+    expect(prismaMock.user.deleteMany).toHaveBeenCalledWith({
+      where: { id: 7 },
     });
   });
 

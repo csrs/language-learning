@@ -85,7 +85,7 @@ router.post("/login", async (req, res) => {
 
   if (!parsedBody.success) {
     return res.status(400).json({
-      error: "email and password are required",
+      error: "email and/or password are missing or incorrect",
     });
   }
 
@@ -104,7 +104,7 @@ router.post("/login", async (req, res) => {
 
   if (!user) {
     return res.status(401).json({
-      error: "Invalid email or password",
+      error: "Invalid email and/or password",
     });
   }
 
@@ -112,7 +112,7 @@ router.post("/login", async (req, res) => {
 
   if (!passwordStatus) {
     return res.status(401).json({
-      error: "Invalid email or password",
+      error: "Invalid email and/or password",
     });
   }
 
