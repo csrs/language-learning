@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { prisma } from "../../prisma/prisma.ts";
 import {
-  deleteRawSessionFromDatabase,
+  deleteSession,
   getSessionCookieOptions,
   getSessionIdFromCookieHeader,
   getUserIdFromSession,
@@ -12,12 +12,12 @@ import {
 export const router = Router();
 
 router.get("/", async (req, res) => {
-  const rawSessionId = getSessionIdFromCookieHeader(req.headers.cookie);
-  const userId = await getUserIdFromSession(rawSessionId);
+  const sessionId = getSessionIdFromCookieHeader(req.headers.cookie);
+  const userId = await getUserIdFromSession(sessionId);
 
   if (!userId) {
-    await deleteRawSessionFromDatabase(rawSessionId);
-    if (rawSessionId) {
+    await deleteSession(sessionId);
+    if (sessionId) {
       res.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
     }
 
@@ -36,7 +36,7 @@ router.get("/", async (req, res) => {
   });
 
   if (!user) {
-    await deleteRawSessionFromDatabase(rawSessionId);
+    await deleteSession(sessionId);
     res.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
 
     return res.status(401).json({
@@ -53,13 +53,13 @@ router.patch("/", (_req, res) => {
   });
 });
 
-router.delete("/", (_req, res) => {
+router.patch("/edit-password", (_req, res) => {
   return res.status(501).json({
     error: "Not implemented",
   });
 });
 
-router.patch("/edit-password", (_req, res) => {
+router.delete("/", (_req, res) => {
   return res.status(501).json({
     error: "Not implemented",
   });

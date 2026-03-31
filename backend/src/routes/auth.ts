@@ -4,8 +4,8 @@ import { Router } from "express";
 import { prisma } from "../../prisma/prisma.js";
 import { createPasswordHash, getIsPasswordValid } from "../lib/password.js";
 import {
-  createSessionInDatabase,
-  deleteRawSessionFromDatabase,
+  createSession,
+  deleteSession,
   getSessionCookieOptions,
   getSessionIdFromCookieHeader,
   SESSION_COOKIE_NAME,
@@ -116,13 +116,8 @@ router.post("/login", async (req, res) => {
     });
   }
 
-  const existingSessionId = getSessionIdFromCookieHeader(req.headers.cookie);
-  if (existingSessionId) {
-    await deleteRawSessionFromDatabase(existingSessionId);
-  }
-
-  const newSessionId = await createSessionInDatabase(user.id);
-  res.cookie(SESSION_COOKIE_NAME, newSessionId, getSessionCookieOptions());
+  const sessionId = await createSession(user.id, req.headers.cookie);
+  res.cookie(SESSION_COOKIE_NAME, sessionId, getSessionCookieOptions());
 
   return res.json({
     id: user.id,
@@ -134,7 +129,7 @@ router.post("/login", async (req, res) => {
 router.post("/logout", async (req, res) => {
   const sessionId = getSessionIdFromCookieHeader(req.headers.cookie);
 
-  await deleteRawSessionFromDatabase(sessionId);
+  await deleteSession(sessionId);
   res.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
 
   return res.status(204).send();

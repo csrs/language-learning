@@ -12,15 +12,15 @@ vi.mock("../../prisma/prisma.js", () => ({
 
 import { prisma } from "../../prisma/prisma.js";
 import {
-  clearExpiredSessions,
-  createSessionInDatabase,
+  deleteExpiredSessions,
+  createSession,
   getSessionCookieOptions,
   getSessionIdFromCookieHeader,
-  getHashedString,
   getUserIdFromSession,
   SESSION_COOKIE_NAME,
-  deleteStoredSessionFromDatabase,
+  deleteSession,
 } from "./session.js";
+import { getHmacHashedString } from "../utils/stringUtils.ts";
 
 const prismaMock = vi.mocked(prisma, { deep: true });
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24;
@@ -43,12 +43,12 @@ afterEach(() => {
   process.env.SESSION_SECRET_KEY = previousSessionSecret;
 });
 
-describe("createSessionInDatabase", () => {
+describe("createSession", () => {
   it("returns the raw session id and stores only the hashed session id", async () => {
-    const sessionId = await createSessionInDatabase(42, 1_000);
-    const storedSessionId = getHashedString(sessionId);
+    const rawSessionId = await createSession(1, undefined, 1_000);
+    const storedSessionId = getHmacHashedString(rawSessionId);
 
-    expect(sessionId).toMatch(/^[0-9a-f]{64}$/i);
+    expect(rawSessionId).toMatch(/^[0-9a-f]{64}$/i);
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
       where: {
         expiresAt: {
@@ -61,27 +61,48 @@ describe("createSessionInDatabase", () => {
     expect(prismaMock.session.create).toHaveBeenCalledWith({
       data: {
         id: storedSessionId,
-        userId: 42,
+        userId: 1,
         expiresAt: new Date(1_000 + SESSION_TTL_MS),
       },
     });
-    expect(storedSessionId).not.toBe(sessionId);
+    expect(storedSessionId).not.toBe(rawSessionId);
+  });
+
+  it("deletes an existing session from the cookie header before creating a new one", async () => {
+    const existingSessionId = "existing-session-id";
+    const cookieHeader = `${SESSION_COOKIE_NAME}=${existingSessionId}`;
+
+    await createSession(1, cookieHeader, 1_000);
+
+    expect(prismaMock.session.deleteMany).toHaveBeenNthCalledWith(1, {
+      where: {
+        expiresAt: {
+          lte: new Date(1_000),
+        },
+      },
+    });
+    expect(prismaMock.session.deleteMany).toHaveBeenNthCalledWith(2, {
+      where: {
+        id: getHmacHashedString(existingSessionId),
+      },
+    });
+    expect(prismaMock.session.create).toHaveBeenCalledTimes(1);
   });
 });
 
 describe("getUserIdFromSession", () => {
   it("returns the stored user id for an active session", async () => {
     prismaMock.session.findUnique.mockResolvedValueOnce({
-      userId: 42,
+      userId: 1,
       expiresAt: new Date(1_000 + SESSION_TTL_MS),
     } as never);
 
-    await expect(getUserIdFromSession("abc123", 1_001)).resolves.toBe(42);
+    await expect(getUserIdFromSession("abc123", 1_001)).resolves.toBe(1);
   });
 
   it("returns null for an expired session and deletes it", async () => {
     prismaMock.session.findUnique.mockResolvedValueOnce({
-      userId: 42,
+      userId: 1,
       expiresAt: new Date(1_000 + SESSION_TTL_MS),
     } as never);
 
@@ -90,24 +111,26 @@ describe("getUserIdFromSession", () => {
     ).resolves.toBeNull();
 
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
-      where: { id: getHashedString("abc123") },
+      where: { id: getHmacHashedString("abc123") },
     });
   });
 });
 
-describe("deleteStoredSessionFromDatabase", () => {
+describe("deleteSession", () => {
   it("deletes a session", async () => {
-    await deleteStoredSessionFromDatabase("abc123");
+    await deleteSession("abc123");
 
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
-      where: { id: "abc123" },
+      where: {
+        id: getHmacHashedString("abc123"),
+      },
     });
   });
 });
 
-describe("clearExpiredSessions", () => {
+describe("deleteExpiredSessions", () => {
   it("deletes expired sessions", async () => {
-    await clearExpiredSessions(1_000);
+    await deleteExpiredSessions(1_000);
 
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
       where: {
