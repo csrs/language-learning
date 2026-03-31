@@ -5,8 +5,8 @@ import { Prisma } from "@prisma/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "../prisma/prisma.js";
 import { createApp } from "./app.js";
-import { createPasswordHash } from "./lib/password.js";
 import { SESSION_COOKIE_NAME } from "./lib/session.js";
+import { createPasswordHash } from "./lib/password.js";
 
 vi.mock("../prisma/prisma.js", () => ({
   prisma: {
