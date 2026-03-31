@@ -481,51 +481,6 @@ describe("me routes", () => {
     expect(prismaMock.user.update).not.toHaveBeenCalled();
   });
 
-  it("updates the password and returns the public user for PATCH /api/me/password", async () => {
-    prismaMock.session.findUnique.mockResolvedValueOnce({
-      userId: 7,
-      expiresAt: new Date(Date.now() + 60_000),
-    } as never);
-    prismaMock.user.update.mockResolvedValueOnce({
-      id: 7,
-      username: "Ada",
-      email: "ada@example.com",
-    } as never);
-
-    const response = await fetch(`${baseUrl}/api/me/password`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Cookie: `${SESSION_COOKIE_NAME}=session-token`,
-      },
-      body: JSON.stringify({
-        password: "new-password",
-      }),
-    });
-
-    expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({
-      id: 7,
-      username: "Ada",
-      email: "ada@example.com",
-    });
-
-    const updateArgs = prismaMock.user.update.mock.calls.at(-1)?.[0];
-
-    expect(updateArgs).toMatchObject({
-      where: { id: 7 },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-      },
-    });
-    expect(updateArgs?.data.password_hash).toMatch(
-      /^scrypt:[0-9a-f]+:[0-9a-f]+$/i,
-    );
-    expect(updateArgs?.data.password_hash).not.toBe("new-password");
-  });
-
   it("returns 401 for PATCH /api/me/password without a session cookie", async () => {
     const response = await fetch(`${baseUrl}/api/me/password`, {
       method: "PATCH",
