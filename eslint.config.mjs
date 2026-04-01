@@ -8,10 +8,11 @@ export default defineConfig(
   // Global ignores
   {
     ignores: [
-      "frontend/dist/**/*",
+      "*/dist/**/*",
       "frontend/public/**/*",
       "frontend/node_modules/**/*",
       "backend/node_modules/**/*",
+      "*.js",
     ],
   },
 

@@ -1,20 +1,39 @@
-import express from "express";
-import bodyParser from "body-parser";
-import { routerGet, routerPost } from "./routes/admin.ts";
+import "dotenv/config";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 
-const app = express();
-const port = 3000;
+import { router as authRouter } from "./routes/auth.ts";
+import { router as meRouter } from "./routes/me.ts";
 
-app.use(bodyParser.urlencoded({ extended: false }));
+export const createApp = () => {
+  const app = express();
 
-app.use(routerGet);
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
 
-app.use(routerPost);
+  app.use("/api/me", meRouter);
+  app.use("/api/auth", authRouter);
 
-// 404 page
-app.use((req, res) => {
-  res.status(404);
-  res.send("<h1>Page not found</h1>");
-});
+  app.use((req, res) => {
+    res.status(404).json({
+      error: `Cannot ${req.method} ${req.originalUrl}`,
+    });
+  });
 
-app.listen(port, () => {});
+  app.use(
+    (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+      void _next;
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    },
+  );
+
+  return app;
+};
+
+const app = createApp();
+
+export default app;

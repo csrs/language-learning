@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["strictUndefinedChecks"] // https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/null-and-undefined
 }
 
 datasource db {
@@ -11,4 +12,15 @@ model User {
   username      String @unique
   email         String @unique
   password_hash String
+  sessions      Session[]
+}
+
+model Session {
+  id        String   @id
+  userId    Int
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
