@@ -14,9 +14,12 @@ export const createApp = () => {
 
   app.use(
     cors({
-      origin: ["http://localhost:5173", "https://your-frontend.vercel.app"],
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      credentials: true, // if you send cookies
+      origin: [
+        "http://localhost:5173",
+        "https://language-learning-iota.vercel.app",
+      ],
+      methods: ["GET", "POST", "PATCH", "DELETE"],
+      credentials: true,
     }),
   );
 
