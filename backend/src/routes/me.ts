@@ -1,15 +1,15 @@
 import { Router } from "express";
 
-import { prisma } from "../../prisma/prisma.ts";
+import { prisma } from "../../prisma/prisma.js";
 import {
   deleteSession,
   getSessionCookieOptions,
   getSessionIdFromCookieHeader,
   getUserIdFromSession,
   SESSION_COOKIE_NAME,
-} from "../lib/session.ts";
+} from "../lib/session.js";
 import z from "zod";
-import { createPasswordHash } from "../lib/password.ts";
+import { createPasswordHash } from "../lib/password.js";
 
 const editUserSchema = z
   .object({
