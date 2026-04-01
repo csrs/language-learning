@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 
 import type { CookieOptions } from "express";
 import { prisma } from "../../prisma/prisma.js";
-import { getHmacHashedString } from "../utils/stringUtils.ts";
+import { getHmacHashedString } from "../utils/stringUtils.js";
 
 export const SESSION_COOKIE_NAME = "sessionId";
 

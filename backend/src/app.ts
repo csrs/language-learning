@@ -4,12 +4,21 @@ import express, {
   type Request,
   type Response,
 } from "express";
+import cors from "cors";
 
-import { router as authRouter } from "./routes/auth.ts";
-import { router as meRouter } from "./routes/me.ts";
+import { router as authRouter } from "./routes/auth.js";
+import { router as meRouter } from "./routes/me.js";
 
 export const createApp = () => {
   const app = express();
+
+  app.use(
+    cors({
+      origin: ["http://localhost:5173", "https://your-frontend.vercel.app"],
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      credentials: true, // if you send cookies
+    }),
+  );
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));

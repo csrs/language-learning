@@ -20,7 +20,7 @@ import {
   SESSION_COOKIE_NAME,
   deleteSession,
 } from "./session.js";
-import { getHmacHashedString } from "../utils/stringUtils.ts";
+import { getHmacHashedString } from "../utils/stringUtils.js";
 
 const prismaMock = vi.mocked(prisma, { deep: true });
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24;
