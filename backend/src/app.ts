@@ -16,6 +16,7 @@ export const createApp = () => {
     cors({
       origin: [
         "http://localhost:5173",
+        "http://localhost:3000",
         "https://language-learning-iota.vercel.app",
       ],
       methods: ["GET", "POST", "PATCH", "DELETE"],
