@@ -14,11 +14,20 @@ export const createApp = () => {
 
   app.use(
     cors({
-      origin: [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://language-learning-iota.vercel.app",
-      ],
+      origin: (origin, callback) => {
+        if (
+          // Allow no origin (Postman doesn't send an 'origin' header)
+          !origin ||
+          // Allow localhost
+          origin === "http://localhost:5173" ||
+          origin === "http://localhost:3000" ||
+          // Allow Vercel domains matching the pattern
+          /^https:\/\/language-learning-.*\.vercel\.app$/.test(origin)
+        ) {
+          return callback(null, true);
+        }
+        return callback(new Error("Not allowed by CORS"));
+      },
       methods: ["GET", "POST", "PATCH", "DELETE"],
       credentials: true,
     }),
