@@ -26,7 +26,6 @@ const editUserSchema = z
       .pipe(z.email({ error: "must be a valid email" }))
       .optional(),
   })
-  .strict()
   .refine((data) => data.username !== undefined || data.email !== undefined, {
     error: "At least one of username or email must be provided",
   });

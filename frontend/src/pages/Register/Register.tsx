@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { useAuth } from "../../context/AuthContext";
+import { registerSchema } from "../../validation/schemas";
 
 export const Register = () => {
   const [username, setUsername] = useState("");
@@ -15,10 +16,11 @@ export const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const isSubmitButtonEnabled =
-    username.trim().length > 0 &&
-    email.trim().length > 0 &&
-    password.length > 0;
+  const isSubmitButtonEnabled = registerSchema.safeParse({
+    username,
+    email,
+    password,
+  }).success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,7 +48,6 @@ export const Register = () => {
           label="Username"
           type="text"
           required
-          fullWidth
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           disabled={isSubmitting}
@@ -55,7 +56,6 @@ export const Register = () => {
           label="Email"
           type="email"
           required
-          fullWidth
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={isSubmitting}
@@ -64,7 +64,6 @@ export const Register = () => {
           label="Password"
           type="password"
           required
-          fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
@@ -72,7 +71,6 @@ export const Register = () => {
         <Button
           type="submit"
           variant="contained"
-          fullWidth
           disabled={!isSubmitButtonEnabled || isSubmitting}
         >
           {isSubmitting ? "Registering..." : "Register"}

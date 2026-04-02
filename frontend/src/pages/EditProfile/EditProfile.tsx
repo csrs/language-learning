@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -6,19 +7,25 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { ChangePassword } from "../ChangePassword/ChangePassword";
 import { editProfile } from "../../api/editProfile";
+import { editProfileSchema } from "../../validation/schemas";
 
 export const EditProfile = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmitEditProfile = async (e: FormEvent<HTMLFormElement>) => {
+  const isSubmitButtonEnabled = editProfileSchema.safeParse({
+    username,
+    email,
+  }).success;
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       await editProfile(username.trim(), email.trim());
-      setUsername("");
-      setEmail("");
+      navigate("/");
     } catch (err) {
       console.error(`Error creating new user: ${err}`);
     } finally {
@@ -34,13 +41,12 @@ export const EditProfile = () => {
         </Typography>
         <Box
           component="form"
-          onSubmit={handleSubmitEditProfile}
+          onSubmit={handleSubmit}
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
           <TextField
             label="Username"
             type="text"
-            fullWidth
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={isSubmitting}
@@ -48,7 +54,6 @@ export const EditProfile = () => {
           <TextField
             label="Email"
             type="email"
-            fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}
@@ -56,11 +61,7 @@ export const EditProfile = () => {
           <Button
             type="submit"
             variant="contained"
-            fullWidth
-            disabled={
-              (username.trim().length === 0 && email.trim().length === 0) ||
-              isSubmitting
-            }
+            disabled={!isSubmitButtonEnabled || isSubmitting}
           >
             {isSubmitting ? "Updating..." : "Edit profile"}
           </Button>

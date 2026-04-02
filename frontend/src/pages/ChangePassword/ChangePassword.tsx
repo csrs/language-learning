@@ -1,23 +1,28 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { changePassword } from "../../api/changePassword";
+import { changePasswordSchema } from "../../validation/schemas";
 
 export const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
-  const isSubmitButtonEnabled = password.length > 0;
+  const isSubmitButtonEnabled = changePasswordSchema.safeParse({
+    password,
+  }).success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       await changePassword(password);
-      setPassword("");
+      navigate("/");
     } catch (err) {
       console.error(`Error creating new user: ${err}`);
     } finally {
@@ -38,7 +43,6 @@ export const ChangePassword = () => {
           label="Password"
           type="password"
           required
-          fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
@@ -46,7 +50,6 @@ export const ChangePassword = () => {
         <Button
           type="submit"
           variant="contained"
-          fullWidth
           disabled={!isSubmitButtonEnabled || isSubmitting}
         >
           {isSubmitting ? "Changing..." : "Change password"}

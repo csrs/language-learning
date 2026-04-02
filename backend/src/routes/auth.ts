@@ -30,8 +30,12 @@ const registerSchema = z
 
 const loginSchema = z
   .object({
-    email: z.string().trim().min(1),
-    password: z.string().min(1),
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .pipe(z.email({ error: "must be a valid email" })),
+    password: z.string().min(8, { error: "must be at least 8 characters" }),
   })
   .strict();
 
