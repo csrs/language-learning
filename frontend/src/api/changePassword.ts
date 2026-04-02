@@ -1,5 +1,7 @@
 export const changePassword = async (password: string) => {
-  const response = await fetch("/api/me/password", {
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+  const response = await fetch(`${API_BASE_URL}/api/me/password`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
