@@ -13,7 +13,7 @@ export const Footer = () => {
         mt: "auto",
       }}
     >
-      <Typography variant="body2">Work-in-progress</Typography>
+      <Typography variant="body2">Language Learning</Typography>
     </Box>
   );
 };

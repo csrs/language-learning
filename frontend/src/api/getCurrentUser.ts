@@ -1,25 +1,18 @@
 import type { User } from "../types/auth.types";
 
-export const editProfile = async (
-  username: string,
-  email: string,
-): Promise<User | null> => {
+export const getCurrentUser = async (): Promise<User | null> => {
   const API_BASE_URL = import.meta.env.VITE_API_URL;
 
   const response = await fetch(`${API_BASE_URL}/api/me`, {
-    method: "PATCH",
+    method: "GET",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      username: username,
-      email: email,
-    }),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to edit profile");
+    throw new Error("Failed to get currently-logged-in user");
   }
 
   return response.json();

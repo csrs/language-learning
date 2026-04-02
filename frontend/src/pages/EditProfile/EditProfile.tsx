@@ -58,8 +58,7 @@ export const EditProfile = () => {
             variant="contained"
             fullWidth
             disabled={
-              username.trim().length > 0 ||
-              email.trim().length > 0 ||
+              (username.trim().length === 0 && email.trim().length === 0) ||
               isSubmitting
             }
           >

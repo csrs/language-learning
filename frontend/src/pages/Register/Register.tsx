@@ -1,16 +1,19 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import { register } from "../../api/register";
+import { useAuth } from "../../context/AuthContext";
 
 export const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const isSubmitButtonEnabled =
     username.trim().length > 0 &&
@@ -22,11 +25,9 @@ export const Register = () => {
     setIsSubmitting(true);
     try {
       await register(username.trim(), email.trim(), password);
-      setUsername("");
-      setEmail("");
-      setPassword("");
+      navigate("/");
     } catch (err) {
-      console.error(`Error creating new user: ${err}`);
+      console.error(`Error registering: ${err}`);
     } finally {
       setIsSubmitting(false);
     }

@@ -3,6 +3,7 @@ export const logout = async () => {
 
   const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },

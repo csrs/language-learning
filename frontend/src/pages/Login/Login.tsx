@@ -4,12 +4,13 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import { login } from "../../api/login";
+import { useAuth } from "../../context/AuthContext";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login } = useAuth();
 
   const isSubmitButtonEnabled =
     email.trim().length > 0 && password.trim().length > 0;
@@ -19,10 +20,8 @@ export const Login = () => {
     setIsSubmitting(true);
     try {
       await login(email.trim(), password.trim());
-      setEmail("");
-      setPassword("");
     } catch (err) {
-      console.error(`Error creating new user: ${err}`);
+      console.error(`Error logging in: ${err}`);
     } finally {
       setIsSubmitting(false);
     }
