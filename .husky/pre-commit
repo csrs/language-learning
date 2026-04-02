@@ -1,2 +1,4 @@
 npm run lint
 npm run type-check
+npm run test:frontend
+npm run test:backend

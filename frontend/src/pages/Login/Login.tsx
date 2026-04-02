@@ -1,27 +1,45 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { useAuth } from "../../context/AuthContext";
+import { loginSchema } from "../../validation/schemas";
 
 export const Login = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [formError, setFormError] = useState("");
   const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const isSubmitButtonEnabled =
-    email.trim().length > 0 && password.trim().length > 0;
+  const parsed = loginSchema.safeParse({ username, password });
+  const isSubmitButtonEnabled = parsed.success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setUsernameError("");
+    setPasswordError("");
+    setFormError("");
+
+    if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+      setUsernameError(fieldErrors.username?.[0] ?? "");
+      setPasswordError(fieldErrors.password?.[0] ?? "");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await login(email.trim(), password.trim());
+      await login(username.trim(), password.trim());
+      navigate("/");
     } catch (err) {
-      console.error(`Error logging in: ${err}`);
+      setFormError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -36,28 +54,34 @@ export const Login = () => {
         onSubmit={handleSubmit}
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
+        {formError && (
+          <Typography color="error" variant="body2">
+            {formError}
+          </Typography>
+        )}
         <TextField
-          label="Email"
-          type="email"
+          label="Username"
+          type="text"
           required
-          fullWidth
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           disabled={isSubmitting}
+          error={!!usernameError}
+          helperText={usernameError}
         />
         <TextField
           label="Password"
           type="password"
           required
-          fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
+          error={!!passwordError}
+          helperText={passwordError}
         />
         <Button
           type="submit"
           variant="contained"
-          fullWidth
           disabled={!isSubmitButtonEnabled || isSubmitting}
         >
           {isSubmitting ? "Logging in..." : "Login"}

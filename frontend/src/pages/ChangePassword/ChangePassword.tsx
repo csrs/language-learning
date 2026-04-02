@@ -1,25 +1,42 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { changePassword } from "../../api/changePassword";
+import { changePasswordSchema } from "../../validation/schemas";
 
 export const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
 
-  const isSubmitButtonEnabled = password.length > 0;
+  const parsed = changePasswordSchema.safeParse({ password });
+  const isSubmitButtonEnabled = parsed.success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setPasswordError("");
+    setFormError("");
+
+    if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+      setPasswordError(fieldErrors.password?.[0] ?? "");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await changePassword(password);
-      setPassword("");
+      navigate("/");
     } catch (err) {
-      console.error(`Error creating new user: ${err}`);
+      setFormError(
+        err instanceof Error ? err.message : "Password change failed",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -34,22 +51,27 @@ export const ChangePassword = () => {
         onSubmit={handleSubmit}
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
+        {formError && (
+          <Typography color="error" variant="body2">
+            {formError}
+          </Typography>
+        )}
         <TextField
           label="Password"
           type="password"
           required
-          fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
+          error={!!passwordError}
+          helperText={passwordError || "Password must be at least 8 characters"}
         />
         <Button
           type="submit"
           variant="contained"
-          fullWidth
           disabled={!isSubmitButtonEnabled || isSubmitting}
         >
-          {isSubmitting ? "Changing..." : "Change password"}
+          {isSubmitting ? "Updating..." : "Change password"}
         </Button>
       </Box>
     </Paper>

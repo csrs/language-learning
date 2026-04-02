@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -6,21 +7,42 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { ChangePassword } from "../ChangePassword/ChangePassword";
 import { editProfile } from "../../api/editProfile";
+import { editProfileSchema } from "../../validation/schemas";
+import { useAuth } from "../../context/AuthContext";
 
 export const EditProfile = () => {
+  const { user } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmitEditProfile = async (e: FormEvent<HTMLFormElement>) => {
+  const parsed = editProfileSchema.safeParse({ username, email });
+  const isSubmitButtonEnabled = parsed.success;
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setUsernameError("");
+    setEmailError("");
+    setFormError("");
+
+    if (!parsed.success) {
+      const flat = parsed.error.flatten();
+      setUsernameError(flat.fieldErrors.username?.[0] ?? "");
+      setEmailError(flat.fieldErrors.email?.[0] ?? "");
+      setFormError(flat.formErrors[0] ?? "");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await editProfile(username.trim(), email.trim());
-      setUsername("");
-      setEmail("");
+      navigate("/");
     } catch (err) {
-      console.error(`Error creating new user: ${err}`);
+      setFormError(err instanceof Error ? err.message : "Update failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -34,33 +56,45 @@ export const EditProfile = () => {
         </Typography>
         <Box
           component="form"
-          onSubmit={handleSubmitEditProfile}
+          onSubmit={handleSubmit}
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
+          {formError && (
+            <Typography color="error" variant="body2">
+              {formError}
+            </Typography>
+          )}
           <TextField
-            label="Username"
             type="text"
-            fullWidth
+            placeholder={user?.username}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={isSubmitting}
+            error={!!usernameError}
+            hiddenLabel
+            helperText={
+              usernameError ||
+              "Username must be between 2 and 20 characters. If nothing is entered here, your current username will remain."
+            }
+            aria-label="Username"
           />
           <TextField
-            label="Email"
             type="email"
-            fullWidth
+            placeholder={user?.email}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}
+            error={!!emailError}
+            helperText={
+              emailError ||
+              "Email must be a valid email address. If nothing is entered here, your current email address will remain."
+            }
+            aria-label="Email address"
           />
           <Button
             type="submit"
             variant="contained"
-            fullWidth
-            disabled={
-              (username.trim().length === 0 && email.trim().length === 0) ||
-              isSubmitting
-            }
+            disabled={!isSubmitButtonEnabled || isSubmitting}
           >
             {isSubmitting ? "Updating..." : "Edit profile"}
           </Button>

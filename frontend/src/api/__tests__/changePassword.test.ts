@@ -1,4 +1,4 @@
-import { changePassword } from "./changePassword";
+import { changePassword } from "../changePassword";
 
 describe("changePassword", () => {
   it("sends a PATCH request with the new password", async () => {

@@ -126,11 +126,12 @@ describe("POST /api/auth/register", () => {
     expect(prismaMock.user.create).not.toHaveBeenCalled();
   });
 
-  it("returns 409 when the username or email already exists", async () => {
+  it("returns 409 when the username already exists", async () => {
     prismaMock.user.create.mockRejectedValueOnce(
       new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
         code: "P2002",
         clientVersion: "test",
+        meta: { target: ["username"] },
       }),
     );
 
@@ -142,7 +143,28 @@ describe("POST /api/auth/register", () => {
 
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({
-      error: "A user with that username or email already exists",
+      error: "A user with that username already exists",
+    });
+  });
+
+  it("returns 409 when the email already exists", async () => {
+    prismaMock.user.create.mockRejectedValueOnce(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
+        code: "P2002",
+        clientVersion: "test",
+        meta: { target: ["email"] },
+      }),
+    );
+
+    const response = await postJson("/api/auth/register", {
+      username: "Ada",
+      email: "ada@example.com",
+      password: "super-secret",
+    });
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({
+      error: "A user with that email already exists",
     });
   });
 
@@ -173,7 +195,7 @@ describe("POST /api/auth/login", () => {
     });
 
     const response = await postJson("/api/auth/login", {
-      email: " ADA@example.com ",
+      username: "Ada",
       password: "correct-password",
     });
 
@@ -190,7 +212,7 @@ describe("POST /api/auth/login", () => {
     expect(response.headers.get("set-cookie")).toContain("SameSite=Lax");
 
     expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-      where: { email: "ada@example.com" },
+      where: { username: "Ada" },
       select: {
         id: true,
         username: true,
@@ -200,14 +222,14 @@ describe("POST /api/auth/login", () => {
     });
   });
 
-  it("returns 400 when email or password is missing", async () => {
+  it("returns 400 when username or password is missing", async () => {
     const response = await postJson("/api/auth/login", {
-      email: "ada@example.com",
+      username: "Ada",
     });
 
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({
-      error: "email and/or password are missing or incorrect",
+      error: "Username and/or password are incorrect.",
     });
     expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
   });
@@ -216,13 +238,13 @@ describe("POST /api/auth/login", () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
 
     const response = await postJson("/api/auth/login", {
-      email: "ada@example.com",
+      username: "Ada",
       password: "correct-password",
     });
 
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({
-      error: "Invalid email and/or password",
+      error: "Username and/or password are incorrect.",
     });
   });
 
@@ -235,13 +257,13 @@ describe("POST /api/auth/login", () => {
     });
 
     const response = await postJson("/api/auth/login", {
-      email: "ada@example.com",
+      username: "Ada",
       password: "wrong-password",
     });
 
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({
-      error: "Invalid email and/or password",
+      error: "Username and/or password are incorrect.",
     });
   });
 
@@ -258,7 +280,7 @@ describe("POST /api/auth/login", () => {
       .mockResolvedValueOnce(user as never);
 
     const response1 = await postJson("/api/auth/login", {
-      email: "ada@example.com",
+      username: "Ada",
       password: "correct-password",
     });
 
@@ -267,7 +289,7 @@ describe("POST /api/auth/login", () => {
     const response2 = await postJson(
       "/api/auth/login",
       {
-        email: "ada@example.com",
+        username: "Ada",
         password: "correct-password",
       },
       {
@@ -304,7 +326,7 @@ describe("me routes", () => {
     } as never);
 
     const loginResponse = await postJson("/api/auth/login", {
-      email: "ada@example.com",
+      username: "Ada",
       password: "correct-password",
     });
     const sessionCookie = getRequiredSessionCookie(loginResponse);
@@ -527,7 +549,7 @@ describe("me routes", () => {
     });
 
     const loginResponse = await postJson("/api/auth/login", {
-      email: "ada@example.com",
+      username: "Ada",
       password: "correct-password",
     });
     const sessionCookie = getRequiredSessionCookie(loginResponse);

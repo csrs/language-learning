@@ -9,6 +9,4 @@ export const logout = async () => {
   if (!response.ok) {
     throw new Error("Failed to logout user");
   }
-
-  return response.json();
 };

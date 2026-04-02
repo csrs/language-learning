@@ -1,4 +1,4 @@
-import { register } from "./register";
+import { register } from "../register";
 
 const mockResponseBody = {
   id: 1,

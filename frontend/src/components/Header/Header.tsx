@@ -1,4 +1,4 @@
-import { Link as RouterLink, useLocation } from "react-router";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
@@ -8,6 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 export const Header = () => {
   const { pathname } = useLocation();
   const { user, isLoading, logout } = useAuth();
+  const navigate = useNavigate();
 
   const isActive = (to: string) =>
     to === "/" ? pathname === "/" : pathname.startsWith(to);
@@ -75,10 +76,18 @@ export const Header = () => {
             </Button>
 
             <Typography sx={{ ml: "auto", mr: 1 }} color="inherit">
-              {user.username}
+              {`Hello
+              ${user.username}!`}
             </Typography>
 
-            <Button color="inherit" variant="text" onClick={logout}>
+            <Button
+              color="inherit"
+              variant="text"
+              onClick={async () => {
+                await logout();
+                navigate("/");
+              }}
+            >
               Logout
             </Button>
           </>

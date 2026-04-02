@@ -14,7 +14,8 @@ export const changePassword = async (
   });
 
   if (!response.ok) {
-    throw new Error("Failed to edit password");
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error ?? "Failed to edit password");
   }
 
   return response.json();
