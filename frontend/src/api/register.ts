@@ -3,10 +3,8 @@ export const register = async (
   email: string,
   password: string,
 ) => {
-  const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-    method: "POST",  credentials: "include",
+  const response = await fetch("/api/auth/register", {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },

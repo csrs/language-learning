@@ -4,11 +4,8 @@ export const editProfile = async (
   username: string,
   email: string,
 ): Promise<User | null> => {
-  const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-  const response = await fetch(`${API_BASE_URL}/api/me`, {
+  const response = await fetch("/api/me", {
     method: "PATCH",
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
