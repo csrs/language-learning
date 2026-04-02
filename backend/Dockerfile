@@ -7,8 +7,7 @@ RUN npm ci --include=dev
 
 COPY prisma ./prisma
 COPY prisma.config.ts ./
-ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder?schema=public"
-RUN npx prisma generate
+RUN DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder?schema=public" npx prisma generate
 
 COPY . .
 

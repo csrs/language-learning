@@ -4,12 +4,34 @@ import express, {
   type Request,
   type Response,
 } from "express";
+import cors from "cors";
 
-import { router as authRouter } from "./routes/auth.ts";
-import { router as meRouter } from "./routes/me.ts";
+import { router as authRouter } from "./routes/auth.js";
+import { router as meRouter } from "./routes/me.js";
 
 export const createApp = () => {
   const app = express();
+
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (
+          // Allow no origin (Postman doesn't send an 'origin' header)
+          !origin ||
+          // Allow localhost
+          origin === "http://localhost:5173" ||
+          origin === "http://localhost:3000" ||
+          // Allow Vercel domains matching the pattern
+          /^https:\/\/language-learning-.*\.vercel\.app$/.test(origin)
+        ) {
+          return callback(null, true);
+        }
+        return callback(new Error("Not allowed by CORS"));
+      },
+      methods: ["GET", "POST", "PATCH", "DELETE"],
+      credentials: true,
+    }),
+  );
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
