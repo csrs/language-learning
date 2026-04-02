@@ -1,7 +1,5 @@
 export const logout = async () => {
-  const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-  const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+  const response = await fetch("/api/auth/logout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -19,7 +19,15 @@
 
 (apply changes that you made in `schema.prisma`, representing changes to the DB tables):
 
+Locally:
+
 1. `cd backend`
 2. `docker compose exec backend sh`
 3. `npx prisma migrate dev --name name_of_migration`
 4. The generated `PrismaClient` will be automatically re-generated (see https://www.prisma.io/docs/orm/prisma-migrate/workflows/development-and-production#create-and-apply-migrations)
+
+In Supabase:
+
+1. `cd backend`
+2. `docker compose exec backend sh`
+3. `DATABASE_URL=<DIRECT_URL_FOR_SUPABASE from backend/.env> npx prisma migrate deploy`

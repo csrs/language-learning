@@ -1,21 +1,27 @@
-import { NavLink, Route, Routes } from "react-router";
-import { Quiz } from "./components/Quiz/Quiz";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import { AuthProvider } from "./context/AuthContext";
+import { Layout } from "./components/Layout/Layout";
 import { Home } from "./components/Home/Home";
+import { Register } from "./pages/Register/Register";
+import { Login } from "./pages/Login/Login";
+import { EditProfile } from "./pages/EditProfile/EditProfile";
 
-function App() {
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: "register", element: <Register /> },
+      { path: "login", element: <Login /> },
+      { path: "edit-profile", element: <EditProfile /> },
+    ],
+  },
+]);
+
+export default function App() {
   return (
-    <div>
-      <nav style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/quiz">Einbürgerungs Quiz</NavLink>
-      </nav>
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/quiz" element={<Quiz />} />
-      </Routes>
-    </div>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 }
-
-export default App;

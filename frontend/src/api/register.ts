@@ -1,11 +1,9 @@
-export const createUser = async (
+export const register = async (
   username: string,
   email: string,
   password: string,
 ) => {
-  const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+  const response = await fetch("/api/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,7 +16,7 @@ export const createUser = async (
   });
 
   if (!response.ok) {
-    throw new Error("Failed to create user");
+    throw new Error("Failed to register user");
   }
 
   return response.json();

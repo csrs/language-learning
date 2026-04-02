@@ -1,10 +1,12 @@
-import { CreateUserForm } from "../CreateUserForm/CreateUserForm";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 export const Home = () => {
   return (
-    <>
-      <p>My projects</p>
-      <CreateUserForm />
-    </>
+    <Box sx={{ textAlign: "center", py: 4, maxWidth: 800, mx: "auto" }}>
+      <Typography variant="h3" gutterBottom>
+        Language Learning
+      </Typography>
+    </Box>
   );
 };
