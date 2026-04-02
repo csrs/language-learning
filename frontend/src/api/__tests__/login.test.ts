@@ -1,22 +1,22 @@
-import { login } from "./login";
+import { login } from "../login";
 
-const mockResponseBody = { id: 1, email: "alice@example.com" };
+const mockResponseBody = { id: 1, username: "alice" };
 
 describe("login", () => {
-  it("sends a POST request with email and password", async () => {
+  it("sends a POST request with username and password", async () => {
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
       .mockResolvedValue(
         new Response(JSON.stringify(mockResponseBody), { status: 200 }),
       );
 
-    const result = await login("alice@example.com", "secret123");
+    const result = await login("alice", "secret123");
 
     expect(fetchSpy).toHaveBeenCalledWith("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: "alice@example.com",
+        username: "alice",
         password: "secret123",
       }),
     });
@@ -28,7 +28,7 @@ describe("login", () => {
       new Response(null, { status: 401 }),
     );
 
-    await expect(login("alice@example.com", "wrong")).rejects.toThrow(
+    await expect(login("alice", "wrong")).rejects.toThrow(
       "Failed to login user",
     );
   });

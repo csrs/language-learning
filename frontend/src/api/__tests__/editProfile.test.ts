@@ -1,4 +1,4 @@
-import { editProfile } from "./editProfile";
+import { editProfile } from "../editProfile";
 
 const mockResponseBody = { id: 1, username: "bob", email: "bob@example.com" };
 

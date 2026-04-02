@@ -76,7 +76,8 @@ export const Header = () => {
             </Button>
 
             <Typography sx={{ ml: "auto", mr: 1 }} color="inherit">
-              {user.username}
+              {`Hello
+              ${user.username}!`}
             </Typography>
 
             <Button

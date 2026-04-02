@@ -13,23 +13,37 @@ export const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [formError, setFormError] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const isSubmitButtonEnabled = registerSchema.safeParse({
-    username,
-    email,
-    password,
-  }).success;
+  const parsed = registerSchema.safeParse({ username, email, password });
+  const isSubmitButtonEnabled = parsed.success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setUsernameError("");
+    setEmailError("");
+    setPasswordError("");
+    setFormError("");
+
+    if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+      setUsernameError(fieldErrors.username?.[0] ?? "");
+      setEmailError(fieldErrors.email?.[0] ?? "");
+      setPasswordError(fieldErrors.password?.[0] ?? "");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await register(username.trim(), email.trim(), password);
       navigate("/");
     } catch (err) {
-      console.error(`Error registering: ${err}`);
+      setFormError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -44,6 +58,11 @@ export const Register = () => {
         onSubmit={handleSubmit}
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
+        {formError && (
+          <Typography color="error" variant="body2">
+            {formError}
+          </Typography>
+        )}
         <TextField
           label="Username"
           type="text"
@@ -51,6 +70,10 @@ export const Register = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           disabled={isSubmitting}
+          error={!!usernameError}
+          helperText={
+            usernameError || "Username must be between 2 and 20 characters"
+          }
         />
         <TextField
           label="Email"
@@ -59,6 +82,8 @@ export const Register = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={isSubmitting}
+          error={!!emailError}
+          helperText={emailError || "Email must be a valid email address"}
         />
         <TextField
           label="Password"
@@ -67,6 +92,8 @@ export const Register = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
+          error={!!passwordError}
+          helperText={passwordError || "Password must be at least 8 characters"}
         />
         <Button
           type="submit"

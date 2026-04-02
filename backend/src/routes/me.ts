@@ -16,14 +16,14 @@ const editUserSchema = z
     username: z
       .string()
       .trim()
-      .min(2, { error: "must be at least 2 characters" })
-      .max(20, { error: "must be at most 20 characters" })
+      .min(2, { error: "Must be at least 2 characters" })
+      .max(20, { error: "Must be at most 20 characters" })
       .optional(),
     email: z
       .string()
       .trim()
       .toLowerCase()
-      .pipe(z.email({ error: "must be a valid email" }))
+      .pipe(z.email({ error: "Must be a valid email" }))
       .optional(),
   })
   .refine((data) => data.username !== undefined || data.email !== undefined, {
@@ -32,7 +32,7 @@ const editUserSchema = z
 
 const editPasswordSchema = z
   .object({
-    password: z.string().min(8, { error: "must be at least 8 characters" }),
+    password: z.string().min(8, { error: "Must be at least 8 characters" }),
   })
   .strict();
 

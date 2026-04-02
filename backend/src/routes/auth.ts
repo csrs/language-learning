@@ -17,25 +17,25 @@ const registerSchema = z
     username: z
       .string()
       .trim()
-      .min(2, { error: "must be at least 2 characters" })
-      .max(20, { error: "must be at most 20 characters" }),
+      .min(2, { error: "Must be at least 2 characters" })
+      .max(20, { error: "Must be at most 20 characters" }),
     email: z
       .string()
       .trim()
       .toLowerCase()
-      .pipe(z.email({ error: "must be a valid email" })),
-    password: z.string().min(8, { error: "must be at least 8 characters" }),
+      .pipe(z.email({ error: "Must be a valid email" })),
+    password: z.string().min(8, { error: "Must be at least 8 characters" }),
   })
   .strict();
 
 const loginSchema = z
   .object({
-    email: z
+    username: z
       .string()
       .trim()
-      .toLowerCase()
-      .pipe(z.email({ error: "must be a valid email" })),
-    password: z.string().min(8, { error: "must be at least 8 characters" }),
+      .min(2, { error: "Must be at least 2 characters" })
+      .max(20, { error: "Must be at most 20 characters" }),
+    password: z.string().min(8, { error: "Must be at least 8 characters" }),
   })
   .strict();
 
@@ -75,8 +75,10 @@ router.post("/register", async (req, res) => {
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
+      const target = (error.meta?.target as string[]) ?? [];
+      const field = target.includes("email") ? "email" : "username";
       return res.status(409).json({
-        error: "A user with that username or email already exists",
+        error: `A user with that ${field} already exists`,
       });
     }
 
@@ -89,15 +91,14 @@ router.post("/login", async (req, res) => {
 
   if (!parsedBody.success) {
     return res.status(400).json({
-      error: "email and/or password are missing or incorrect",
+      error: "Username and/or password are incorrect.",
     });
   }
 
-  const { email, password } = parsedBody.data;
+  const { username, password } = parsedBody.data;
 
-  const normalizedEmail = email.trim().toLowerCase();
   const user = await prisma.user.findUnique({
-    where: { email: normalizedEmail },
+    where: { username },
     select: {
       id: true,
       username: true,
@@ -108,7 +109,7 @@ router.post("/login", async (req, res) => {
 
   if (!user) {
     return res.status(401).json({
-      error: "Invalid email and/or password",
+      error: "Username and/or password are incorrect.",
     });
   }
 
@@ -116,7 +117,7 @@ router.post("/login", async (req, res) => {
 
   if (!passwordStatus) {
     return res.status(401).json({
-      error: "Invalid email and/or password",
+      error: "Username and/or password are incorrect.",
     });
   }
 
