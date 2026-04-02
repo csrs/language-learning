@@ -7,15 +7,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
-}
-
-.matchingGameButton.guessed {
-  color: blue;
-}
-
-.matchingGameButton.matched {
-  color: green;
+* {
+  box-sizing: border-box;
 }
