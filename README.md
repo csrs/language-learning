@@ -41,3 +41,8 @@ In Supabase:
 ### Rollback a failed migration in Supabase
 
 1. `DATABASE_URL="<DIRECT_URL_FOR_SUPABASE from backend/.env>" npx prisma migrate resolve --rolled-back "<name-of-migration"` https://www.prisma.io/docs/orm/prisma-migrate/workflows/patching-and-hotfixing#failed-migration
+
+### Apply data to Supabase database
+
+1. Change DATABASE_URL in `backend/.env` file to the Supabase Direct connection string
+2. Run `npx tsx src/scripts/ankiToDatabase.ts` or whatever script populates the tables

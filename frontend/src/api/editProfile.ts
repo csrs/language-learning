@@ -16,7 +16,9 @@ export const editProfile = async (
   });
 
   if (!response.ok) {
-    const body = await response.json().catch(() => null);
+    const body: { error?: string } | null = await response
+      .json()
+      .catch((): null => null);
     throw new Error(body?.error ?? "Failed to edit profile");
   }
 

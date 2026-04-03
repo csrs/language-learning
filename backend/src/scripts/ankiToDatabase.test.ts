@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeVerbsToInfinitive } from "./ankiToDatabase.ts";
+import { normalizeVerbsToInfinitive } from "./ankiToDatabase.js";
 
 describe("normalizeTargetLanguageVerbs", () => {
   it("prepends 'to ' if not present", () => {

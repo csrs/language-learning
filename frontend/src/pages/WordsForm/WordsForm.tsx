@@ -16,14 +16,9 @@ export const WordsForm = () => {
   const [formError, setFormError] = useState("");
   const [words, setWords] = useState<any[]>([]);
   const [numOfWordsError, setNumOfWordsError] = useState("");
-  const [languageError, setLanguageError] = useState("");
 
-  // Zod schema for validation
   const schema = z.object({
     numOfWords: z.string().max(2, { error: "Must be at most 99 characters" }),
-    language: z.enum(["en", "de"], {
-      errorMap: () => ({ message: "Select a language" }),
-    }),
   });
 
   const parsed = schema.safeParse({ numOfWords, language });
@@ -33,13 +28,11 @@ export const WordsForm = () => {
     e.preventDefault();
     setFormError("");
     setNumOfWordsError("");
-    setLanguageError("");
     setWords([]);
     const result = schema.safeParse({ numOfWords, language });
     if (!result.success) {
       const flat = result.error.flatten();
       setNumOfWordsError(flat.fieldErrors.numOfWords?.[0] ?? "");
-      setLanguageError(flat.fieldErrors.language?.[0] ?? "");
       setFormError(flat.formErrors[0] ?? "");
       return;
     }
@@ -92,7 +85,7 @@ export const WordsForm = () => {
           )}
           <TextField
             type="number"
-            label="Number of Words"
+            label="NumberofWords"
             value={numOfWords}
             onChange={(e) => setNumOfWords(e.target.value)}
             disabled={isSubmitting}
@@ -101,7 +94,7 @@ export const WordsForm = () => {
             helperText={numOfWordsError || "1-99 words"}
             slotProps={{ htmlInput: { min: 1, max: 99 } }}
           />
-          <FormControl fullWidth required error={!!languageError}>
+          <FormControl fullWidth required>
             <InputLabel id="language-select-label">Language</InputLabel>
             <Select
               labelId="language-select-label"
@@ -115,9 +108,6 @@ export const WordsForm = () => {
               <MenuItem value="en">English (en)</MenuItem>
               <MenuItem value="de">German (de)</MenuItem>
             </Select>
-            <Typography variant="caption" color="error">
-              {languageError}
-            </Typography>
           </FormControl>
           <Button
             type="submit"

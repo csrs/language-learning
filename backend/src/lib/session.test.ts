@@ -60,7 +60,7 @@ describe("createSession", () => {
 
     expect(prismaMock.session.create).toHaveBeenCalledWith({
       data: {
-        id: storedSessionId,
+        sessionId: storedSessionId,
         userId: 1,
         expiresAt: new Date(1_000 + SESSION_TTL_MS),
       },
@@ -83,7 +83,7 @@ describe("createSession", () => {
     });
     expect(prismaMock.session.deleteMany).toHaveBeenNthCalledWith(2, {
       where: {
-        id: getHmacHashedString(existingSessionId),
+        sessionId: getHmacHashedString(existingSessionId),
       },
     });
     expect(prismaMock.session.create).toHaveBeenCalledTimes(1);
@@ -111,7 +111,7 @@ describe("getUserIdFromSession", () => {
     ).resolves.toBeNull();
 
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
-      where: { id: getHmacHashedString("abc123") },
+      where: { sessionId: getHmacHashedString("abc123") },
     });
   });
 });
@@ -122,7 +122,7 @@ describe("deleteSession", () => {
 
     expect(prismaMock.session.deleteMany).toHaveBeenCalledWith({
       where: {
-        id: getHmacHashedString("abc123"),
+        sessionId: getHmacHashedString("abc123"),
       },
     });
   });
