@@ -16,11 +16,58 @@ model User {
 }
 
 model Session {
-  id        String   @id
+  id        Int      @id @default(autoincrement())
   userId    Int
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model Word {
+  id                Int             @id @default(autoincrement())
+  value             String
+  languageId        Int
+  language          Language        @relation(fields: [languageId], references: [id])
+  meanings          WordMeaning[]
+  translationsTo    Translation[]   @relation("translationTo")
+
+  @@unique([value, languageId])
+}
+
+model WordMeaning {
+  id              Int          @id @default(autoincrement())
+  wordId          Int
+  word            Word         @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  partOfSpeechId  Int
+  partOfSpeech    PartOfSpeech @relation(fields: [partOfSpeechId], references: [id])
+  exampleTarget   String
+  exampleBase     String
+  translations    Translation[]
+
+  @@index([wordId])
+  @@index([partOfSpeechId])
+}
+
+model Translation {
+  id              Int         @id @default(autoincrement())
+  wordMeaningId   Int
+  wordMeaning     WordMeaning @relation(fields: [wordMeaningId], references: [id])
+  toWordId        Int
+  toWord          Word        @relation("translationTo", fields: [toWordId], references: [id])
+
+  @@unique([wordMeaningId, toWordId])
+}
+
+model PartOfSpeech {
+  id        Int       @id @default(autoincrement())
+  value     String    @unique
+  meanings  WordMeaning[]
+}
+
+model Language {
+  id        Int       @id @default(autoincrement())
+  value     String    @unique @db.VarChar(2)
+  words     Word[]
 }

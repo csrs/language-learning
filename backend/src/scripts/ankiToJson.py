@@ -3,7 +3,6 @@ import json
 input_file = "input.txt"
 output_file = "output.json"
 
-# 🌍 Prompt user for languages
 base_language = input("Enter base language (ISO, e.g. en): ").strip().lower()
 target_language = input("Enter target language (ISO, e.g. de): ").strip().lower()
 
