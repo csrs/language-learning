@@ -67,6 +67,7 @@ const parseInputFile = async () => {
       let count = 0;
       stream.on("data", async (row) => {
         stream.pause();
+        // todo: remove this count
         if (count < 227) {
           count++;
 
@@ -148,7 +149,7 @@ const parseInputFile = async () => {
         console.log("CSV import complete");
       });
       stream.on("close", async () => {
-        console.log("Stream closed after 10 rows");
+        console.log("Stream closed after 227 rows");
         await prisma.$disconnect();
         resolve();
       });
