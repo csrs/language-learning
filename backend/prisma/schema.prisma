@@ -16,10 +16,10 @@ model User {
 }
 
 model Session {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId        String   @id 
+  userId           Int
+  expiresAt        DateTime
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
@@ -32,6 +32,7 @@ model Word {
   language          Language        @relation(fields: [languageId], references: [id])
   meanings          ExampleSentence[]
   translationsTo    Translation[]   @relation("translationTo")
+  frequencyCount    Int?
 
   @@unique([value, languageId])
 }

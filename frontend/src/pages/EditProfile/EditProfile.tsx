@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -12,8 +12,8 @@ import { useAuth } from "../../context/AuthContext";
 
 export const EditProfile = () => {
   const { user } = useAuth();
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(user?.username || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -42,11 +42,18 @@ export const EditProfile = () => {
       await editProfile(username.trim(), email.trim());
       navigate("/");
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Update failed");
+      setFormError(err instanceof Error ? err.message : "Edit profile failed");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username || "");
+      setEmail(user.email || "");
+    }
+  }, [user]);
 
   return (
     <Box sx={{ maxWidth: 400, mx: "auto", mt: 4 }}>
@@ -66,7 +73,6 @@ export const EditProfile = () => {
           )}
           <TextField
             type="text"
-            placeholder={user?.username}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={isSubmitting}
@@ -80,7 +86,6 @@ export const EditProfile = () => {
           />
           <TextField
             type="email"
-            placeholder={user?.email}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}

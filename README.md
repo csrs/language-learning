@@ -30,10 +30,14 @@ In Supabase:
 
 1. `cd backend`
 2. `docker compose exec backend sh`
-3. `DATABASE_URL=<DIRECT_URL_FOR_SUPABASE from backend/.env> npx prisma migrate deploy`
+3. `DATABASE_URL="<DIRECT_URL_FOR_SUPABASE from backend/.env>" npx prisma migrate deploy`
 
 ### How to remove all data from local database
 
 1. `cd backend`
 2. `docker compose exec backend sh`
 3. `echo 'TRUNCATE "Translation", "ExampleSentence", "Word", "PartOfSpeech", "Language", "Session", "User" RESTART IDENTITY CASCADE;' | npx prisma db execute --stdin`
+
+### Rollback a failed migration in Supabase
+
+1. `DATABASE_URL="<DIRECT_URL_FOR_SUPABASE from backend/.env>" npx prisma migrate resolve --rolled-back "<name-of-migration"` https://www.prisma.io/docs/orm/prisma-migrate/workflows/patching-and-hotfixing#failed-migration
