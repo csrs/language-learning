@@ -1,184 +1,168 @@
 import { prisma } from "../../prisma/prisma.js";
-import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
 
-interface JsonExample {
-  target: string;
-  base: string;
-}
+import { createReadStream } from "fs";
+import { parse } from "csv-parse";
 
-interface JsonMeaning {
-  part_of_speech: string;
-  translations: string[];
-  examples: JsonExample[];
-}
+const POS_TAGS = new Set([
+  "adj",
+  "adv",
+  "verb",
+  "der",
+  "das",
+  "die",
+  "die (pl)",
+  "prep",
+  "conj",
+  "pron",
+  "art",
+  "aux",
+]);
+const posMap = new Map<string, number>();
 
-interface JsonEntry {
-  id: string;
-  target_word: string;
-  base_language: string;
-  target_language: string;
-  meanings: JsonMeaning[];
-}
+const baseLanguage = "de";
+const targetLanguage = "en";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-async function seed() {
-  const raw = readFileSync(join(__dirname, "output.json"), "utf-8");
-  const entries: JsonEntry[] = JSON.parse(raw);
-
-  console.log(`Loaded ${entries.length} entries from output.json`);
-
-  // 1. Seed languages
-  const deLang = await prisma.language.upsert({
-    where: { value: "de" },
-    update: {},
-    create: { value: "de" },
+// todo: utilize this
+const normalizeTargetLanguageVerbs = (translations: string[]): string[] => {
+  return translations.map((t) => {
+    t = t.trim();
+    return t.toLowerCase().startsWith("to ") ? t : "to " + t;
   });
-  const enLang = await prisma.language.upsert({
-    where: { value: "en" },
-    update: {},
-    create: { value: "en" },
-  });
-  console.log(`Languages seeded: de(${deLang.id}), en(${enLang.id})`);
+};
 
-  // 2. Seed parts of speech
-  const posValues = [
-    "adj",
-    "adv",
-    "verb",
-    "noun",
-    "prep",
-    "conj",
-    "pron",
-    "art",
-    "aux",
-  ];
-  const posMap = new Map<string, number>();
-  for (const pos of posValues) {
-    const record = await prisma.partOfSpeech.upsert({
-      where: { value: pos },
-      update: {},
-      create: { value: pos },
-    });
-    posMap.set(pos, record.id);
-  }
-  console.log(`Parts of speech seeded: ${posMap.size} values`);
+const parseInputFile = async () => {
+  return new Promise<void>((resolve, reject) => {
+    (async () => {
+      // 1. Seed languages
+      const baseLang = await prisma.language.upsert({
+        where: { value: baseLanguage },
+        update: {},
+        create: { value: baseLanguage },
+      });
+      const targetLang = await prisma.language.upsert({
+        where: { value: targetLanguage },
+        update: {},
+        create: { value: targetLanguage },
+      });
+      console.log(
+        `Languages seeded: ${baseLanguage}(${baseLang.id}), ${targetLanguage}(${targetLang.id})`,
+      );
 
-  // 3. Cache for English words: "value" -> Word.id
-  const enWordCache = new Map<string, number>();
-
-  // Process entries in batches using transactions
-  const BATCH_SIZE = 100;
-  for (let i = 0; i < entries.length; i += BATCH_SIZE) {
-    const batch = entries.slice(i, i + BATCH_SIZE);
-
-    await prisma.$transaction(async (tx) => {
-      for (const entry of batch) {
-        // Create the German (target) word
-        const deWord = await tx.word.upsert({
-          where: {
-            value_languageId: {
-              value: entry.target_word,
-              languageId: deLang.id,
-            },
-          },
+      // 2. Seed parts of speech
+      const posValues = [...POS_TAGS];
+      for (const pos of posValues) {
+        const record = await prisma.partOfSpeech.upsert({
+          where: { value: pos },
           update: {},
-          create: {
-            value: entry.target_word,
-            languageId: deLang.id,
-          },
+          create: { value: pos },
         });
+        posMap.set(pos, record.id);
+      }
+      console.log(`Parts of speech seeded: ${posMap.size} values`);
 
-        // Process each meaning
-        for (const meaning of entry.meanings) {
-          const posId = posMap.get(meaning.part_of_speech);
-          if (posId === undefined) {
-            console.warn(
-              `Unknown POS "${meaning.part_of_speech}" for word "${entry.target_word}", skipping meaning`,
-            );
-            continue;
-          }
+      const stream = createReadStream("./src/scripts/input.csv").pipe(
+        parse({ columns: true, delimiter: "," }),
+      );
 
-          const exampleTarget = meaning.examples[0]?.target ?? "";
-          const exampleBase = meaning.examples[0]?.base ?? "";
+      let count = 0;
+      stream.on("data", async (row) => {
+        stream.pause();
+        if (count < 227) {
+          count++;
 
-          // Create WordMeaning
-          const wordMeaning = await tx.wordMeaning.create({
-            data: {
-              wordId: deWord.id,
-              partOfSpeechId: posId,
-              exampleTarget,
-              exampleBase,
+          // 1. Insert or update the base word
+          const word = await prisma.word.upsert({
+            where: {
+              value_languageId: {
+                value: row.base_word,
+                languageId: baseLang.id,
+              },
+            },
+            update: {},
+            create: {
+              value: row.base_word,
+              languageId: baseLang.id,
             },
           });
 
-          // Create English translation words + Translation rows
-          for (const translationValue of meaning.translations) {
-            let enWordId = enWordCache.get(translationValue);
+          // 2. For each translation set (up to 3)
+          for (let i = 1; i <= 3; i++) {
+            const pos = row[`target_part_of_speech_${i}`];
+            const baseSentence = row[`base_sentence_${i}`];
+            const targetSentence = row[`target_sentence_${i}`];
+            if (!pos || !baseSentence || !targetSentence) continue;
 
-            if (enWordId === undefined) {
-              const enWord = await tx.word.upsert({
-                where: {
-                  value_languageId: {
-                    value: translationValue,
-                    languageId: enLang.id,
-                  },
-                },
-                update: {},
-                create: {
-                  value: translationValue,
-                  languageId: enLang.id,
-                },
-              });
-              enWordId = enWord.id;
-              enWordCache.set(translationValue, enWordId);
+            const posId = posMap.get(pos);
+            if (!posId) continue;
+
+            // 3. Create ExampleSentence (meaning) for this word and POS
+            const exampleSentence = await prisma.exampleSentence.create({
+              data: {
+                wordId: word.id,
+                partOfSpeechId: posId,
+                exampleTarget: baseSentence,
+                exampleBase: targetSentence,
+              },
+            });
+
+            // After creating the ExampleSentence (meaning) for the base word:
+            // Insert the corresponding word in the target language
+            let targetWord = row[`target_word_${i}`];
+            if (targetWord === "(past tense)") {
+              targetWord = `past tense of "${row.base_word}"`;
+            } else if (targetWord === "(future tense)") {
+              targetWord = `future tense of "${row.base_word}"`;
+            } else if (targetWord === "(passive voice)") {
+              targetWord = `passive voice for "${row.base_word}"`;
             }
-
-            await tx.translation.upsert({
+            const translationWord = await prisma.word.upsert({
               where: {
-                wordMeaningId_toWordId: {
-                  wordMeaningId: wordMeaning.id,
-                  toWordId: enWordId,
+                value_languageId: {
+                  value: targetWord,
+                  languageId: targetLang.id,
                 },
               },
               update: {},
               create: {
-                wordMeaningId: wordMeaning.id,
-                toWordId: enWordId,
+                value: targetWord,
+                languageId: targetLang.id,
+              },
+            });
+
+            await prisma.translation.create({
+              data: {
+                exampleSentenceId: exampleSentence.id, // the meaning you just created
+                toWordId: translationWord.id, // the translated word
               },
             });
           }
+
+          if (count === 227) {
+            stream.destroy();
+            return;
+          }
         }
-      }
-    });
-
-    console.log(
-      `Processed ${Math.min(i + BATCH_SIZE, entries.length)} / ${entries.length}`,
-    );
-  }
-
-  // Print summary
-  const [wordCount, meaningCount, translationCount, enWordCount] =
-    await Promise.all([
-      prisma.word.count({ where: { languageId: deLang.id } }),
-      prisma.wordMeaning.count(),
-      prisma.translation.count(),
-      prisma.word.count({ where: { languageId: enLang.id } }),
-    ]);
-
-  console.log(`\nDone!`);
-  console.log(`  German words:   ${wordCount}`);
-  console.log(`  English words:  ${enWordCount}`);
-  console.log(`  Word meanings:  ${meaningCount}`);
-  console.log(`  Translations:   ${translationCount}`);
+        stream.resume();
+      });
+      stream.on("end", () => {
+        console.log("CSV import complete");
+      });
+      stream.on("close", async () => {
+        console.log("Stream closed after 10 rows");
+        await prisma.$disconnect();
+        resolve();
+      });
+      stream.on("error", (err) => {
+        reject(err);
+      });
+    })().catch(reject);
+  });
+};
+async function seed() {
+  await parseInputFile();
 }
 
-seed()
-  .catch((e) => {
-    console.error("Seed failed:", e);
-    process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());
+seed().catch((e) => {
+  console.error("Seed failed:", e);
+  process.exit(1);
+});

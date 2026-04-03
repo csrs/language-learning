@@ -30,13 +30,13 @@ model Word {
   value             String
   languageId        Int
   language          Language        @relation(fields: [languageId], references: [id])
-  meanings          WordMeaning[]
+  meanings          ExampleSentence[]
   translationsTo    Translation[]   @relation("translationTo")
 
   @@unique([value, languageId])
 }
 
-model WordMeaning {
+model ExampleSentence {
   id              Int          @id @default(autoincrement())
   wordId          Int
   word            Word         @relation(fields: [wordId], references: [id], onDelete: Cascade)
@@ -51,19 +51,19 @@ model WordMeaning {
 }
 
 model Translation {
-  id              Int         @id @default(autoincrement())
-  wordMeaningId   Int
-  wordMeaning     WordMeaning @relation(fields: [wordMeaningId], references: [id])
-  toWordId        Int
-  toWord          Word        @relation("translationTo", fields: [toWordId], references: [id])
+  id                  Int             @id @default(autoincrement())
+  exampleSentenceId   Int
+  exampleSentence     ExampleSentence @relation(fields: [exampleSentenceId], references: [id])
+  toWordId            Int
+  toWord              Word            @relation("translationTo", fields: [toWordId], references: [id])
 
-  @@unique([wordMeaningId, toWordId])
+  @@unique([exampleSentenceId, toWordId])
 }
 
 model PartOfSpeech {
   id        Int       @id @default(autoincrement())
   value     String    @unique
-  meanings  WordMeaning[]
+  meanings  ExampleSentence[]
 }
 
 model Language {

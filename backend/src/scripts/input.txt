@@ -1,11 +1,11 @@
 1	der	deːɐ̯	art	the	Der Mann und die Frau kochen, das Kind spielt.	The man and the woman are cooking; the child is playing.	pron	that, those	Das ist der Mann, den ich liebe.	That’s the man I love.	pron	who, that	Dort steht das Mädchen, das mit mir zur Schule geht.	There’s the girl who goes to school with me.	98121.3994047137 | 0.985748849292909	art pron
 2	und	ʊnt	conj	and	Die Eltern und Kinder essen und sprechen über ihren Tag.	The parents and children eat and talk about their day.									26562.1138941099 | 0.976565375470124	conj
 3	in	ɪn	prep	in	Günter geht in den Keller.	Günter goes into the basement.									24319.0219460678 | 0.977144419461825	prep
-4	sein, ist, war, ist gewesen	zaɪ̯n	verb	to be	Ich bin Lehrer und du bist Polizist und damit sind wir glücklich.	I’m a teacher, and you’re a police officer, and we’re happy with that.	aux	(past tense)	Janosch ist heute Morgen in die Schule gefahren.	Janosch went to school this morning.					23948.8531272045 | 0.966774501407212	aux verb
+4	sein, ist, war, ist gewesen	zaɪ̯n	verb	to be	Ich bin Lehrer und du bist Polizist und damit sind wir glücklich.	I’m a teacher, and you’re a police officer, and we’re happy with that.						23948.8531272045 | 0.966774501407212	aux verb
 5	ein	aɪ̯n	art	a, an	Er wohnt in einem Hotel.	He’s staying at a hotel.	pron	one (of)	Eines der Kinder hat sich beim Spielen verletzt.	One of the children was injured while playing.					22328.803944183 | 0.983236013304992	art pron
-6	haben, hat, hatte, hat gehabt	ˈhaːbn̩	verb	to have	Ich habe ein Buch in der Hand.	I have a book in my hand.	aux	(past tense)	Sie hat sich gestern einen Film angesehen.	She was watching a movie yesterday.					12452.0335431794 | 0.941569945956103	aux verb
+6	haben, hat, hatte, hat gehabt	ˈhaːbn̩	verb	to have	Ich habe ein Buch in der Hand.	I have a book in my hand.						12452.0335431794 | 0.941569945956103	aux verb
 7	sie	ziː	pron	she, her	Paul besucht Anna, sie ist Pauls Tante.	Paul visits Anna; she’s Paul’s aunt.	pron	they, them	Petra und Klaus kochen, sie bekommen Besuch.	Petra and Klaus are cooking; they have a visitor.	pron	you	Ich bitte Sie um Ihr Verständnis.	I ask you for your understanding.	10186.3697246754 | 0.939017458725529	pron
-8	werden, wird, wurde, ist geworden	ˈveːɐ̯dn̩	verb	to become, get	Der Junge wird zum Mann.	The boy becomes a man.	aux	(future tense)	Ich werde bald als Lehrer arbeiten.	I’ll be working as a teacher soon.	aux	(passive voice)	Das Auto wird gefahren.	The car is being driven.	10166.3113157715 | 0.975331568209246	aux verb
+8	werden, wird, wurde, ist geworden	ˈveːɐ̯dn̩	verb	to become, get	Der Junge wird zum Mann.	The boy becomes a man.		10166.3113157715 | 0.975331568209246	aux verb
 9	von	fɔn	prep	from, of	Benjamin ist der Bruder von Anna.	Benjamin is the brother of Anna.									10060.1052440566 | 0.979008027636438	prep
 10	ich	ɪç	pron	I	Ich arbeite und du bleibst zu Hause.	I work and you stay home.									9785.54653151669 | 0.890874681457969	pron
 11	nicht	nɪçt	part	not	Im Restaurant darf man nicht rauchen.	You can’t smoke in the restaurant.									9291.42955935273 | 0.956185824412173	part
@@ -56,7 +56,7 @@
 56	viel	fiːl	pron	much, a lot, many	Ich gebe im Urlaub viel Geld aus.	I spend a lot of money on vacation.									2032.99613193051 | 0.942867754176494	pron
 57	wollen, will, wollte, hat gewollt	ˈvɔlən	verb	to want to	Die Kinder wollen spielen.	The children want to play.									2017.6689447828 | 0.933935560312433	verb
 58	machen, macht, machte, hat gemacht	ˈmaxn̩	verb	to do, make	Die Schüler machen ihre Aufgaben.	The students do their tasks.									1971.09598062013 | 0.928747377659966	verb
-59	andere (r, s)	ˈandəʁə	pron	other	Es gibt noch einen anderen Weg zum Bahnhof.	There’s another way to the station.									1940.9344419243 | 0.970559908460345	pron
+59	andere (r, s, n, m)	ˈandəʁə	pron	other	Es gibt noch einen anderen Weg zum Bahnhof.	There’s another way to the station.									1940.9344419243 | 0.970559908460345	pron
 60	sollen, soll, sollte, hat gesollt	ˈzɔlən	verb	should, ought to	Ihr sollt in der Bibliothek leise sein.	You should be quiet in the library.									1839.85386044532 | 0.957702018605499	verb
 61	schon	ʃoːn	adv	already	Günter arbeitet schon seit 30 Jahren hier.	Günter has been working here for 30 years now.	part		Die Karten für das Theater sind schon sehr teuer.	The tickets for the theater are really expensive.					1839.70600976544 | 0.933228590427611	adv part
 62	kommen, kommt, kam, ist gekommen	ˈkɔmən	verb	to come	Wir kommen morgen Abend zu dir.	We’ll come to your place tomorrow night.									1836.94613040765 | 0.945349345004173	verb
@@ -84,7 +84,7 @@
 84	neu	nɔɪ̯	adj	new	Ich habe eine neue Tasche, weil die alte kaputt ist.	I got a new bag because the old one’s broken.									1213.21339554759 | 0.942132654393388	adj
 85	stehen, steht, stand, hat gestanden	ˈʃteːən	verb	to stand	Die Fahrräder stehen im Keller.	The bicycles stand in the cellar.									1187.19167588844 | 0.953336903884843	verb
 86	unser	ˈʊnzɐ	pron	our	Unser Verein hat das Spiel verloren.	Our club lost the game.									1171.0266682214 | 0.898939563471416	pron
-87	jede (r, s)	ˈjeːdə	pron	every	Wir fahren jeden Sommer in den Urlaub.	We go on vacation every summer.									1162.50061234823 | 0.96914746429124	pron
+87	jede (r, s, n, m)	ˈjeːdə	pron	every	Wir fahren jeden Sommer in den Urlaub.	We go on vacation every summer.									1162.50061234823 | 0.96914746429124	pron
 88	weil	vaɪ̯l	conj	because	Frederiks Mutter steht früh auf, weil sie um sechs Uhr arbeiten muss.	Frederik’s mother gets up early because she has to work at six o’clock.									1157.86795771195 | 0.933161866147258	conj
 89	unter	ˈʊntɐ	prep	under	Unter der Brücke fließt ein Fluss.	Under the bridge a river flows.									1133.62044621138 | 0.97116677733196	prep
 90	der Mensch, -en	mɛnʃ	der	human being	Es gibt über sieben Milliarden Menschen auf der Welt.	There are over seven billion human beings in the world.									1093.5529119635 | 0.928551717276978	der
@@ -92,7 +92,7 @@
 92	ihn	iːn	pron	him	Ich treffe ihn immer am Donnerstag in der Universität.	I always meet him on Thursday at the university.									1078.66927685542 | 0.89738719518441	pron
 93	denn	dɛn	conj	because	Heute sind alle Geschäfte geschlossen, denn es ist Sonntag.	Today all shops are closed because it is Sunday.	part	anyway	Was sagt denn deine Mutter dazu?	What does your mother say about that anyway?					1055.21030231423 | 0.926592565403401	conj part
 94	das Beispiel, -e	ˈbaɪ̯ˌʃpiːl	das	example	Das Beispiel passt nicht gut zu diesem Argument.	The example does not fit this argument well.									1027.41437449651 | 0.902441456358117	das
-95	erste (r, s)	ˈeːɐ̯stə	adj	first	Jonah feiert heute seinen ersten Geburtstag.	Jonah celebrates his first birthday today.									1025.29518141821 | 0.961540976125913	adj
+95	erste (r, s, n, m)	ˈeːɐ̯stə	adj	first	Jonah feiert heute seinen ersten Geburtstag.	Jonah celebrates his first birthday today.									1025.29518141821 | 0.961540976125913	adj
 96	die Zeit, -en	t͡saɪ̯t	die	time	Jannik braucht viel Zeit für seine Aufgabe.	Jannik needs a lot of time for his task.									967.288431344699 | 0.952768817550733	die
 97	lang	laŋ	adj	long	Mit ihren langen Beinen rennt sie schneller als Max.	With her long legs she runs faster than Max.	adv	for a long time	Jeden Tag warten sie lange auf den Bus.	Every day they wait a long time for the bus.					929.931492894641 | 0.953243081418035	adj adv
 98	leben, lebt, lebte, hat gelebt	ˈleːbn̩	verb	to live	Frauen leben länger als Männer.	Women live longer than men.									927.565882016537 | 0.941043891921357	verb
@@ -149,7 +149,7 @@
 149	wer	veːɐ̯	pron	who, whoever	Wer ist da?	Who is there?									583.960901971944 | 0.930053888849918	pron
 150	dazu	daˈt͡suː	pron	in addition, furthermore, to that, for that	Ich koche heute und brauche dazu Eier.	I’m cooking tonight and I need eggs for that.									578.835411736052 | 0.960939804501838	pron
 151	eigentlich	ˈaɪ̯ɡn̩tlɪç	adj	actual, real	Steffen ist der eigentliche Chef der Firma, aber er ist selten da.	Steffen is the real boss of the company, but he’s rarely there.	adv	actually	Eigentlich mag ich kein Eis, aber ich esse es trotzdem.	Actually, I don’t like ice cream, but I eat it anyway.	part		Was studiert deine Schwester eigentlich genau?	What exactly is your sister studying?	569.816520263281 | 0.876608401027724	adj adv part
-152	letzte (r, s)	ˈlɛt͡stə	adj	last	Das ist das letzte Auto, das ich für meinen Sohn kaufe, das nächste bezahlt er selbst.	This is the last car I’m buying for my son; the next one he’ll be paying for himself.									564.247477987744 | 0.952034226826547	adj
+152	letzte (r, s, n, m)	ˈlɛt͡stə	adj	last	Das ist das letzte Auto, das ich für meinen Sohn kaufe, das nächste bezahlt er selbst.	This is the last car I’m buying for my son; the next one he’ll be paying for himself.									564.247477987744 | 0.952034226826547	adj
 153	fragen, fragt, fragte, hat gefragt	ˈfʁaːɡn̩	verb	to ask	Die Touristen fragen nach dem Weg.	The tourists ask for directions.									559.811957591299 | 0.897087891553608	verb
 154	der Herr, -en	hɛʁ	der	Mr.	Unser neuer Lehrer heißt Herr Schmidt.	Our new teacher is called Mr. Schmidt.									558.678435712208 | 0.818165436143158	der
 155	halten, hält, hielt, hat gehalten	ˈhaltn̩	verb	to stop, hold	Er hält ein Buch in seinen Händen.	He’s holding a book in his hands.									556.460675513986 | 0.945422002310531	verb
@@ -179,7 +179,7 @@
 179	brauchen, braucht, brauchte, hat gebraucht	ˈbʁaʊ̯xn̩	verb	to need	Brauchst du Hilfe?	Do you need any help?									487.020139529644 | 0.92834255863531	verb
 180	die Hand, -̈e	hant	die	hand	Ich schreibe mit meiner rechten Hand.	I write with my right hand.									482.190350653515 | 0.889946095569703	die
 181	etwa	ˈɛtva	adv	about, approximately	Die Führung dauert etwa eine Stunde.	The tour lasts about one hour.	part	after all	Hat er etwa noch nicht angerufen?	He hasn’t called yet after all?					481.894649293752 | 0.939324547527451	adv part
-182	weitere (r, s)	ˈvaɪ̯təʁə	adj	additional, further	Weitere Informationen finden Sie im Internet.	Further information can be found on the internet.									477.951964496912 | 0.946340454005356	adj
+182	weitere (r, s, n, m)	ˈvaɪ̯təʁə	adj	additional, further	Weitere Informationen finden Sie im Internet.	Further information can be found on the internet.									477.951964496912 | 0.946340454005356	adj
 183	das Ende, -n	ˈɛndə	das	end	Das Ende des Romans ist wirklich spannend.	The end of the novel is really exciting.									477.015576857662 | 0.953263724595744	das
 184	schreiben, schreibt, schrieb, hat geschrieben	ˈʃʁaɪ̯bn̩	verb	to write	Er schreibt einen Brief an seine Freundin.	He’s writing a letter to his girlfriend.									472.481489341297 | 0.911388142551315	verb
 185	solch	zɔlç	pron	such	Unter solchen Bedingungen kann ich nicht arbeiten.	I can’t work in such conditions.									470.411579822956 | 0.957742322255461	pron
@@ -234,7 +234,7 @@
 234	arbeiten, arbeitet, arbeitete, hat gearbeitet	ˈaʁbaɪ̯tn̩	verb	to work	Marlene arbeitet in einem Krankenhaus.	Marlene works in a hospital.									366.078283386581 | 0.927017329711589	verb
 235	das Geld, -er	ɡɛlt	das	money	Du gibst viel Geld aus.	You spend a lot of money.									366.078283386581 | 0.920850481583733	das
 236	das Unternehmen, -	ʊntɐˈneːmən	das	enterprise, company	Ich gründe mein eigenes Unternehmen.	I am starting my own company.									365.585447786976 | 0.812191475240578	das
-237	nächste (r, s)	ˈnɛːçstə	adj	next	Nächste Woche gehen wir schwimmen.	Next week we’re going swimming.									365.141895747331 | 0.952572201652606	adj
+237	nächste (r, s, n, m)	ˈnɛːçstə	adj	next	Nächste Woche gehen wir schwimmen.	Next week we’re going swimming.									365.141895747331 | 0.952572201652606	adj
 238	erklären, erklärt, erklärte, hat erklärt	ɛɐ̯ˈklɛːʁən	verb	to explain	Max erklärt mir komplizierte Dinge.	Max explains complicated things to me.									365.04332862741 | 0.948368100745174	verb
 239	klar	klaːɐ̯	adj	clear	Das Wasser ist sehr klar.	The water is very clear.									364.0576574282 | 0.938591306860215	adj
 240	der Doktor, -en (Dr.)	ˈdɔktoːɐ̯	der	doctor	Wenn ich Schmerzen habe, gehe ich zu einem Doktor.	Whenever I’m in pain, I go to a doctor.									362.579150629386 | 0.773360686100765	der
@@ -311,7 +311,7 @@
 311	leicht	laɪ̯çt	adj	light, easy	Das ist eine leichte Aufgabe.	It’s an easy task.									270.369609943293 | 0.954954182485454	adj
 312	je	jeː	adv	ever, each	Das kostet vier Euro je Stück.	That costs four euros each.	conj	the more	Je später ich ins Bett gehe, desto müder bin ich am Morgen.	The later I go to bed, the more tired I am in the morning.					270 | 0.955560859470024	adv conj
 313	verlieren, verliert, verlor, hat verloren	fɛɐ̯ˈliːʁən	verb	to lose	Johann verliert immer beim Fußball.	Johann always loses at soccer.									269.334655184123 | 0.94385995297027	verb
-314	beste (r, s)	ˈbɛstə	adj	best	Lisett ist meine beste Freundin.	Lisett is my best friend.									268.10256618511 | 0.93287114976222	adj
+314	beste (r, s, n, m)	ˈbɛstə	adj	best	Lisett ist meine beste Freundin.	Lisett is my best friend.									268.10256618511 | 0.93287114976222	adj
 315	bilden, bildet, bildete, hat gebildet	ˈbɪldn̩	verb	to form, educate	Wir gehen in die Schule, um uns zu bilden.	We go to school to educate ourselves.									267.215462105821 | 0.862274720290024	verb
 316	der Monat, -e	ˈmoːnat	der	month	Das Jahr hat zwölf Monate.	The year has twelve months.									266.919760746058 | 0.932247186159744	der
 317	die Lösung, -en	ˈløːzʊŋ	die	solution	Für jedes Problem gibt es eine Lösung.	There is a solution to every problem.									266.377641586493 | 0.815060554871761	die
@@ -392,7 +392,7 @@
 392	die Angst, -Äe	aŋst	die	fear, anxiety	Martin lernt in der Therapie, mit Angst und Stress umzugehen.	Martin learns in therapy how to deal with fear and stress.									213.249963949076 | 0.919001556097598	die
 393	allgemein	ˌalɡəˈmaɪ̯n	adj	general	Der Kurs beginnt mit einer allgemeinen Einführung in das Thema.	The course begins with a general introduction to the topic.									212.954262589313 | 0.898296372719685	adj
 394	fühlen, fühlt, fühlte, hat gefühlt	ˈfyːlən	verb	to feel	Ich fühle mich manchmal einsam.	I feel lonely sometimes.									212.264292749866 | 0.922735933211857	verb
-395	jene (r, s)	ˈjeːnə	pron	that, those	Ich denke gerne zurück an jene Tage in Frankreich.	I like to think back to those days in France.									210.637935271169 | 0.904780801772903	pron
+395	jene (r, s, n, m)	ˈjeːnə	pron	that, those	Ich denke gerne zurück an jene Tage in Frankreich.	I like to think back to those days in France.									210.637935271169 | 0.904780801772903	pron
 396	erinnern, erinnert, erinnerte, hat erinnert	ɛɐ̯ˈʔɪnɐn	verb	to remind	Mein Handy erinnert mich an den Termin um 14 Uhr.	My phone reminds me of the appointment at 2:00.									209.997248991683 | 0.924996728206911	verb
 397	oh	oː	part	oh, aw	Oh, du machst einen Fehler.	Oh, you’re making a mistake.									206.843101154211 | 0.711463783140445	part
 398	bedeuten, bedeutet, bedeutete, hat bedeutet	bəˈdɔɪ̯tn̩	verb	to mean	Was bedeutet dieses Wort?	What does this word mean?									206.202414874725 | 0.959470896948772	verb
@@ -430,7 +430,7 @@
 430	sozial	zoˈt͡si̯aːl	adj	social	Jemand, der viele Freunde hat, lebt in einem guten sozialen Umfeld.	Someone who has a lot of friends lives in a good social environment.									191.91018248618 | 0.878942222689526	adj
 431	die Folge, -n	ˈfɔlɡə	die	result, consequences	Deine Entscheidung wird Folgen haben.	Your decision will have consequences.									191.663764686378 | 0.930293579739165	die
 432	der Satz, -̈e	zat͡s	der	sentence	Der Satz besteht aus sechs Wörtern.	The sentence consists of six words.									191.614481126417 | 0.906040996653578	der
-433	manche (r, s)	ˈmançə	pron	some, many a	Manche Menschen mögen keinen Kaffee.	Some people don’t like coffee.									191.515914006496 | 0.938325750159233	pron
+433	manche (r, s, n, m)	ˈmançə	pron	some, many a	Manche Menschen mögen keinen Kaffee.	Some people don’t like coffee.									191.515914006496 | 0.938325750159233	pron
 434	die Verbindung, -en	fɛɐ̯ˈbɪndʊŋ	die	connection, link	Entschuldige, die Verbindung ist schlecht.	Sorry, this connection is bad.									189.93884008776 | 0.804523496361914	die
 435	beschreiben, beschreibt, beschrieb, hat beschrieben	bəˈʃʁaɪ̯bn̩	verb	to describe	Bitte beschreibe mir dein Haus, damit ich es finde.	Please describe your house so I can find it.									189.150303128392 | 0.901658633810861	verb
 436	das Licht, -er	lɪçt	das	light	Ich brauche ein helleres Licht zum Lesen.	I need a brighter light to read.									188.263199049103 | 0.864204886190783	das
@@ -509,7 +509,7 @@
 509	die Musik, -en	muˈziːk	die	music	Sie hören die gleiche Musik.	They listen to the same music.									165.888462827037 | 0.874087603692279	die
 510	schauen, schaut, schaute, hat geschaut	ˈʃaʊ̯ən	verb	to look	Du musst immer nach vorn schauen.	You always have to look ahead.									165.888462827037 | 0.899739162332813	verb
 511	das Stück, -e	ʃtʏk	das	piece	Er gibt ihr ein Stück von dem Brot.	He gives her a piece of the bread.									165.691328587195 | 0.911528502429053	das
-512	besondere (r, s)	bəˈzɔndəʁə	adj	special	Sie haben ein besonderes Haus, das Energie spart.	They have a special house that saves energy.									165.395627227432 | 0.9305270755522	adj
+512	besondere (r, s, n, m)	bəˈzɔndəʁə	adj	special	Sie haben ein besonderes Haus, das Energie spart.	They have a special house that saves energy.									165.395627227432 | 0.9305270755522	adj
 513	tot	toːt	adj	dead	Die Fische sind tot, weil Florian sich nicht um sie gekümmert hat.	The fish are dead because Florian did not look after them.									165.297060107511 | 0.888981543192878	adj
 514	der Gott, -̈er	ɡɔt	der	God	Die Menschen in der Kirche glauben an Gott.	People in the church believe in God.									164.952075187788 | 0.88835817077534	der
 515	völlig	ˈfœlɪç	adj	completely, absolutely	Du hast völlig recht.	You’re absolutely right.									164.656373828025 | 0.946110596876855	adj
@@ -668,7 +668,7 @@
 668	das Verhältnis, -se	fɛɐ̯ˈhɛltnɪs	das	relationship	Sophia hat ein enges Verhältnis zu ihren Eltern.	Sophia has a close relationship to her parents.									131.734955774412 | 0.938266428454888	das
 669	selten	ˈzɛltn̩	adj	rare	Jana sammelt seltene Steine.	Jana collects rare stones.									131.636388654491 | 0.948690419621552	adj
 670	die Zeitung, -en	ˈt͡saɪ̯tʊŋ	die	newspaper	Jeden Morgen lese ich Zeitung.	I read the newspaper every morning.									131.636388654491 | 0.917962062598019	die
-671	innere (r, s)	ˈɪnəʁə	adj	internal	Seine inneren Organe sind nicht verletzt.	His internal organs aren’t injured.									131.53782153457 | 0.906193863367019	adj
+671	innere (r, s, n, m)	ˈɪnəʁə	adj	internal	Seine inneren Organe sind nicht verletzt.	His internal organs aren’t injured.									131.53782153457 | 0.906193863367019	adj
 672	beispielsweise, bspw.	ˈbaɪ̯ʃpiːlsˌvaɪ̯zə	adv	for example, such as	Daniela spricht verschiedene europäische Sprachen, wie beispielsweise Französisch.	Daniela speaks several European languages, such as French.									131.439254414649 | 0.915206668519263	adv
 673	die Bedingung, -en	bəˈdɪŋʊŋ	die	condition, stipulation	Die Chefin möchte die Bedingungen bei der Arbeit verbessern.	The boss wants to improve working conditions.									131.192836614846 | 0.794237922211149	die
 674	das Fenster, -	ˈfɛnstɐ	das	window	Kannst du bitte das Fenster öffnen?	Could you open the window, please?									130.897135255083 | 0.8543899789855	das
@@ -783,7 +783,7 @@
 783	die Erde, -n	ˈeːɐ̯də	die	earth, ground, soil	Die Erde wird auch blauer Planet genannt.	Earth is also called the blue planet.									109.606637352148 | 0.903026987623294	die
 784	die Studie, -n	ˈʃtuːdi̯ə	die	study	Laut einer Studie ist der Virus sehr gefährlich.	According to a study, this virus is very dangerous.									109.458786672267 | 0.853124809213425	die
 785	vorne, vorn	ˈfɔʁnə	adv	at/to the front	Nach dem Unfall ist vorne am Auto ein Schaden.	There’s some damage to the front of the car after the accident.									109.360219552346 | 0.899931345399271	adv
-786	rechte (r, s)	ˈʁɛçtə	adj	right	In Deutschland muss man auf der rechten Seite der Straße fahren.	In Germany you have to drive on the right side of the road.									109.261652432425 | 0.920538095856473	adj
+786	rechte (r, s, n, m)	ˈʁɛçtə	adj	right	In Deutschland muss man auf der rechten Seite der Straße fahren.	In Germany you have to drive on the right side of the road.									109.261652432425 | 0.920538095856473	adj
 787	die Meinung, -en	ˈmaɪ̯nʊŋ	die	opinion	Ich würde gern deine Meinung dazu hören.	I’d like to hear your opinion on this.									109.212368872464 | 0.928925511769115	die
 788	drehen, dreht, drehte, hat gedreht	ˈdʁeːən	verb	to turn	Sie dreht ihr Gesicht zur Sonne.	She’s turning her face to the sun.									109.113801752543 | 0.896901016781163	verb
 789	der Künstler, -	ˈkʏnstlɐ	der	artist	Die Künstlerin zeigt ihre Bilder in der neuen Ausstellung.	The artist shows her paintings in the new exhibition.									108.965951072662 | 0.819437300673665	der
@@ -868,7 +868,7 @@
 868	die Verfügung, -en	fɛɐ̯ˈfyːɡʊŋ	die	disposal	Verfügungen können von Anwälten erstellt werden.	Disposals may be drawn up by lawyers.									99.8484924799694 | 0.911583181197899	die
 869	feiern, feiert, feierte, hat gefeiert	ˈfaɪ̯ɐn	verb	to celebrate	Wir feiern ihren Geburtstag.	We’re celebrating her birthday.									99.7992089200089 | 0.904776833248417	verb
 870	das Programm, -e	pʁoˈɡʁam	das	program	Der Leiter stellt den Teilnehmern das Programm vor.	The instructor introduces the program to the participants.									99.7499253600484 | 0.914921177532798	das
-871	linke (r, s)	ˈlɪŋkə	adj	left	Auf der rechten Seite steht die Kirche und auf der linken ist die Universität.	On the right is the church and on the left is the university.									99.6513582401274 | 0.894144184434011	adj
+871	linke (r, s, n, m)	ˈlɪŋkə	adj	left	Auf der rechten Seite steht die Kirche und auf der linken ist die Universität.	On the right is the church and on the left is the university.									99.6513582401274 | 0.894144184434011	adj
 872	der Einfluss, -̈e	ˈaɪ̯nˌflʊs	der	influence	Der Chef der Firma hat einen großen Einfluss in der Branche.	The head of the company has great influence in his line of business.									99.6020746801669 | 0.909338672963615	der
 873	die Temperatur, -en	tɛmpəʁaˈtuːɐ̯	die	temperature	Die Temperaturen werden weiter steigen.	Temperatures will continue to rise.									99.3556568803645 | 0.729741533902345	die
 874	leer	leːɐ̯	adj	empty	Die Flasche ist leer.	The bottle is empty.									99.3063733204039 | 0.900652494900177	adj
@@ -1176,11 +1176,11 @@
 1176	das Schiff, -e	ʃɪf	das	ship	Das Schiff transportiert Öl.	The ship is transporting oil.									74.0239070606684 | 0.872389941729611	das
 1177	tausend	ˈtaʊ̯zn̩t	num	thousand	Tausend Menschen nehmen an den Demonstrationen teil.	A thousand people take part in the demonstrations.									74.0239070606684 | 0.926238947156528	num
 1178	die Tat, -en	taːt	die	deed, action	Der Mann steht für seine Taten vor Gericht.	The man is facing trial for his actions.									73.9746235007079 | 0.904101447541142	die
-1179	obere (r, s)	ˈoːbəʁə	adj	upper	Die obere Hälfte des Brotes ist verbrannt.	The upper half of the bread is burned.									73.8760563807869 | 0.87821656697381	adj
+1179	obere (r, s, n, m)	ˈoːbəʁə	adj	upper	Die obere Hälfte des Brotes ist verbrannt.	The upper half of the bread is burned.									73.8760563807869 | 0.87821656697381	adj
 1180	die Gleichung, -en	ˈɡlaɪ̯çʊŋ	die	equation	Die Lehrerin erklärt die chemische Gleichung.	The teacher explains the chemical equation.									73.6789221409449 | 0.712670038061681	die
 1181	der Stein, -e	ʃtaɪ̯n	der	rock, stone	Sie werfen Steine auf die Polizei.	They throw stones at the police.									73.6789221409449 | 0.901533359323442	der
 1182	kümmern (sich), kümmert, kümmerte, hat gekümmert	ˈkʏmɐn	verb	to take care of, be concerned	Bitte kümmere dich gut um meinen Hund.	Please take good care of my dog.									73.5803550210239 | 0.917542272147565	verb
-1183	mittlere (r, s)	ˈmɪtləʁə	adj	middle, average	Sie öffnet das rechte und das mittlere Fenster.	She opens the right and the middle window.									73.4817879011029 | 0.837121133050744	adj
+1183	mittlere (r, s, n, m)	ˈmɪtləʁə	adj	middle, average	Sie öffnet das rechte und das mittlere Fenster.	She opens the right and the middle window.									73.4817879011029 | 0.837121133050744	adj
 1184	erheben, erhebt, erhob, hat erhoben	ɛɐ̯ˈheːbn̩	verb	to raise	Interviews sind eine Möglichkeit, um Daten zu erheben.	Interviews are one way to raise data.									73.3832207811819 | 0.920495397357135	verb
 1185	die Erklärung, -en	ɛɐ̯ˈklɛːʁʊŋ	die	explanation	Ich habe keine Erklärung für diesen Unfall.	I have no explanation for this accident.									73.3832207811819 | 0.860390757423008	die
 1186	das Konzept, -e	kɔnˈt͡sɛpt	das	concept, idea, plan	Die Schule arbeitet nach einem demokratischen Konzept.	The school works according to a democratic idea.									73.2846536612609 | 0.902771686510079	das
@@ -1689,7 +1689,7 @@
 1689	verpflichten, verpflichtet, verpflichtete, hat verpflichtet	fɛɐ̯ˈp͡flɪçtn̩	verb	to obligate, oblige, commit	Der Vertrag verpflichtet Frau Meier dazu, 30 Stunden pro Woche zu arbeiten.	The contract obliges Ms. Meier to work 30 hours a week.									50.6634996393922 | 0.855502009970702	verb
 1690	begrüßen, begrüßt, begrüßte, hat begrüßt	bəˈɡʁyːsn̩	verb	to greet	Felix kommt ins Büro und begrüßt als erstes alle Kollegen.	Felix comes into the office and greets all his colleagues first.									50.6142160794317 | 0.869377511582278	verb
 1691	die Führung, -en	ˈfyːʁʊŋ	die	management, command, leadership	Unter der Führung des neuen Managers steigen die Umsätze wieder.	Sales increase again under the leadership of the new manager.									50.6142160794317 | 0.856815492946741	die
-1692	untere (r, s)	ˈʊntəʁə	adj	lower	Ich wohne in der unteren Wohnung, damit ich nicht so viele Treppen steigen muss.	I live in the lower apartment so I don’t have to climb so many stairs.									50.6142160794317 | 0.802625812580845	adj
+1692	untere (r, s, n, m)	ˈʊntəʁə	adj	lower	Ich wohne in der unteren Wohnung, damit ich nicht so viele Treppen steigen muss.	I live in the lower apartment so I don’t have to climb so many stairs.									50.6142160794317 | 0.802625812580845	adj
 1693	das Handy, -s	ˈhɛndi	das	mobile phone	Mit den neuen Handys kann man nicht nur telefonieren, sondern auch ins Internet gehen.	With the new mobile phones you can not only make phone calls, but also go online.									50.5649325194712 | 0.855599110575789	das
 1694	die Hauptstadt, -̈e	ˈhaʊ̯ptˌʃtat	die	capital city	Berlin ist die Hauptstadt von Deutschland.	Berlin is the capital city of Germany.									50.5156489595107 | 0.862430078621319	die
 1695	das Experiment, -e	ɛkspeʁiˈmɛnt	das	experiment	Der Lehrer zeigt in einem Experiment, wie zwei chemische Substanzen miteinander reagieren.	The teacher shows in an experiment how two chemical substances react with each other.									50.4663653995502 | 0.821798319886206	das
@@ -1908,7 +1908,7 @@
 1908	steuern, steuert, steuerte, hat gesteuert	ˈʃtɔɪ̯ɐn	verb	to steer, control	Über das Lenkrad kann man steuern, wohin das Auto fährt.	Via the steering wheel you can control where the car goes.									43.7145176849619 | 0.928310345695551	verb
 1909	das Wunder, -	ˈvʊndɐ	das	miracle	Die Menschen sprechen von Wundern, wenn etwas passiert, das unglaublich ist.	People talk about miracles when something happens that’s incredible.									43.7145176849619 | 0.914526437176395	das
 1910	der Abschluss, -̈e	ˈapˌʃlʊs	der	end, conclusion, graduation	Ein tolles Abendessen war der Abschluss unserer Reise.	A great dinner was the end of our trip.									43.6652341250014 | 0.890783542729844	der
-1911	irgendwelche (r, s)	ˈɪʁɡn̩tˌvɛlçə	pron	some, any	Können Sie mir irgendwelche Informationen zu dieser Veranstaltung geben?	Can you give me any information about this event?									43.6652341250014 | 0.839434040219747	pron
+1911	irgendwelche (r, s, n, m)	ˈɪʁɡn̩tˌvɛlçə	pron	some, any	Können Sie mir irgendwelche Informationen zu dieser Veranstaltung geben?	Can you give me any information about this event?									43.6652341250014 | 0.839434040219747	pron
 1912	korrekt	kɔˈʁɛkt	adj	correct	Die Antwort ist korrekt!	The answer is correct!									43.6652341250014 | 0.869536041546132	adj
 1913	die Vorsitzende	ˈfoːɐ̯ˌzɪt͡sn̩də	der, die	chairperson	Thomas ist der neue Vorsitzende der Organisation für Umwelt.	Thomas is the new chairperson of the Organization for the Environment.									43.6652341250014 | 0.848867229137007	der die
 1914	verraten, verrät, verriet, hat verraten	fɛɐ̯ˈʁaːtn̩	verb	to tell a secret, give away, betray	Felix verrät Hannah sein Geheimnis.	Felix tells Hannah his secret.									43.6159505650409 | 0.908746163680166	verb
@@ -2233,7 +2233,7 @@
 2233	befürchten, befürchtet, befürchtete, hat befürchtet	bəˈfʏʁçtn̩	verb	to fear	Ich befürchte, dass ich den Zug verpassen werde.	I’m afraid I’m gonna miss the train.									36.3219836908872 | 0.916037777347739	verb
 2234	hinsichtlich	ˈhɪnzɪçtlɪç	prep	with regard to	Viele Jugendliche fühlen sich unsicher hinsichtlich ihrer Berufswahl.	Many adolescents feel insecure with regard to their career choices.									36.3219836908872 | 0.7994424975332	prep
 2235	die Katze, -n	ˈkat͡sə	die	cat	Neben ihrem Hund hat Ute auch eine Katze, sie liebt beide Tiere sehr.	Besides her dog Ute also has a cat, she loves both animals very much.									36.3219836908872 | 0.801376473166792	die
-2236	äußere (r, s)	ˈɔɪ̯səʁə	adj	outer, external	Das Ohr besteht aus einem äußeren, sichtbaren und einem inneren Teil.	The ear consists of an external, visible and an internal part.									36.2727001309267 | 0.824594138096688	adj
+2236	äußere (r, s, n, m)	ˈɔɪ̯səʁə	adj	outer, external	Das Ohr besteht aus einem äußeren, sichtbaren und einem inneren Teil.	The ear consists of an external, visible and an internal part.									36.2727001309267 | 0.824594138096688	adj
 2237	die Halle, -n	ˈhalə	die	hall	Das Konzert findet in einer riesigen Halle statt.	The concert takes place in a huge hall.									36.2727001309267 | 0.876941145200946	die
 2238	die Häufigkeit, -en	ˈhɔɪ̯fɪçkaɪ̯t	die	frequency	Die Häufigkeit von Wörtern spielt eine wichtige Rolle beim Lernen von Fremdsprachen.	The frequency of words plays an important role in language learning.									36.2727001309267 | 0.49991970312007	die
 2239	das Kapital, -e	kapiˈtaːl	das	capital	Die Firma hat nicht genügend Kapital, um im Wettbewerb zu bleiben.	The company does not have the capital to stay competitive.									36.2727001309267 | 0.753021139870378	das
@@ -2277,7 +2277,7 @@
 2277	die Tiefe, -n	ˈtiːfə	die	depth	Es könnten noch unbekannte Tiere in den Tiefen des Ozeans leben.	There may be still unknown animals living in the depths of the ocean.									35.4841631715587 | 0.872882202816	die
 2278	unternehmen, unternimmt, unternahm, hat unternommen	ˌʊntɐˈneːmən	verb	to undertake, do, take action	Sarah möchte im Urlaub am Strand liegen, während Erik lieber etwas unternehmen möchte.	Sarah wants to lie on the beach on vacation, while Erik would rather do something.									35.4841631715587 | 0.927784702443902	verb
 2279	moralisch	moˈʁaːlɪʃ	adj	moral	Es ist für sie eine moralische Pflicht, Geld zu spenden.	For her, it is a moral duty to donate money.									35.4348796115982 | 0.833159640818282	adj
-2280	selbe (r, s)	ˈzɛlbə	pron	same	Robin erledigt die Aufgaben noch am selben Tag.	Robin completes the tasks on the same day.									35.4348796115982 | 0.94147258517097	pron
+2280	selbe (r, s, n, m)	ˈzɛlbə	pron	same	Robin erledigt die Aufgaben noch am selben Tag.	Robin completes the tasks on the same day.									35.4348796115982 | 0.94147258517097	pron
 2281	stärken, stärkt, stärkte, hat gestärkt	ˈʃtɛʁkn̩	verb	to strengthen	Gutes Essen und Sport stärken die Gesundheit.	Good food and exercise strengthen your health.									35.4348796115982 | 0.879502480579542	verb
 2282	Millimeter, mm	ˈmɪliˌmeːtɐ	der	millimeter	Ein Zentimeter hat zehn Millimeter.	One centimeter equals ten millimeters.									35.3855960516377 | 0.753393102127842	der
 2283	FDP (Freie Demokratische Partei)	ɛfdeːˈpeː	die	FDP	Die FDP ist eine deutsche Partei und wurde 1948 gegründet.	The FDP is a German party and was founded in 1948.									35.3363124916772 | 0.723155227990936	die
@@ -3126,7 +3126,7 @@
 3126	benachbart	bəˈnaxbaːɐ̯t	adj	neighboring, adjacent	Wir gehen häufig im benachbarten Ort einkaufen.	We often go shopping in the neighboring town.									23.2618403013552 | 0.856889533674232	adj
 3127	explizit	ɛkspliˈt͡siːt	adj	explicit	Der Arzt rät dem Patienten explizit zu der Operation.	The doctor advises the patient explicitly to have the operation.									23.2618403013552 | 0.832761472233952	adj
 3128	gegebenenfalls	ɡəˈɡeːbənənfals	adv	if necessary	Falls Sie die Aufgabe nicht verstehen, fragen Sie gegebenenfalls besser noch einmal nach.	If you do not understand the task, ask again if necessary.									23.2618403013552 | 0.832904598488305	adv
-3129	hintere (r, s)	ˈhɪntəʁə	adj	rear	Ich möchte in der hintersten Reihe sitzen.	I want to sit in the rear row.									23.2618403013552 | 0.713207618825877	adj
+3129	hintere (r, s, n, m)	ˈhɪntəʁə	adj	rear	Ich möchte in der hintersten Reihe sitzen.	I want to sit in the rear row.									23.2618403013552 | 0.713207618825877	adj
 3130	schwingen, schwingt, schwang, hat geschwungen	ˈʃvɪŋən	verb	to swing	Ole schwingt das Kind an den Armen durch die Luft.	Ole swings the child by the arms through the air.									23.2618403013552 | 0.879119311609616	verb
 3131	erleiden, erleidet, erlitt, hat erlitten	ɛɐ̯ˈlaɪ̯dn̩	verb	to suffer	Viele Menschen auf der Welt erleiden noch immer große Armut.	Many people in the world still suffer great poverty.									23.2125567413947 | 0.882247763061747	verb
 3132	der Export, -e	ɛksˈpɔʁt	der	export	Die Hälfte unserer Ware ist für den Export bestimmt.	Half of our goods are destined for export.									23.2125567413947 | 0.785348900956745	der
@@ -3649,7 +3649,7 @@
 3649	das Budget, -s	byˈd͡ʒeː	das	budget	Die Firma verfügt über ein jährliches Budget von 20 Millionen Euro.	The company has an annual budget of 20 million euros.									18.7770363449498 | 0.645592957504461	das
 3650	das Gemüse, -	ɡəˈmyːzə	das	vegetables	Gemüse ist gesund, weil es viel Vitamine enthält.	Vegetables are healthy because they contain a lot of vitamins.									18.7770363449498 | 0.854172702546422	das
 3651	gültig	ˈɡʏltɪç	adj	valid	Mein Pass ist noch drei Jahre gültig.	My passport is still valid for three years.									18.7770363449498 | 0.91153052949815	adj
-3652	jegliche (r, s)	ˈjeːklɪçə	pron	any	Jeglicher Kontakt mit den Bakterien macht dich krank.	Any contact with the bacteria will make you sick.									18.7770363449498 | 0.913280488930049	pron
+3652	jegliche (r, s, n, m)	ˈjeːklɪçə	pron	any	Jeglicher Kontakt mit den Bakterien macht dich krank.	Any contact with the bacteria will make you sick.									18.7770363449498 | 0.913280488930049	pron
 3653	mitbekommen, bekommt mit, bekam mit, hat mitbekommen	ˈmɪtbəˌkɔmən	verb	to notice, catch, get	Sie arbeitet so konzentriert, dass sie den Streit hinter sich nicht mitbekommt.	She’s so focused that she doesn’t notice the fight behind her.									18.7770363449498 | 0.87943843703391	verb
 3654	der Skandal, -e	skanˈdaːl	der	scandal	Die Presse freut sich über den Skandal und berichtet über jedes Detail.	The press is pleased with the scandal and reports on every detail.									18.7770363449498 | 0.874391886222102	der
 3655	weggehen, geht weg, ging weg, ist weggegangen	ˈvɛkˌɡeːən	verb	to leave, go away	Viele Leute gehen nach dem Abitur weg, um in einer anderen Stadt zu studieren.	Many people go away after graduation to study in another city.									18.7770363449498 | 0.855218515386142	verb
