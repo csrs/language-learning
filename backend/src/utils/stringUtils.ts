@@ -9,3 +9,13 @@ export const getHmacHashedString = (inputString: string) => {
 
   return createHmac("sha256", secret).update(inputString).digest("hex");
 };
+
+export const normalizeVerbsToInfinitive = (input: string): string => {
+  return input
+    .split(",")
+    .map((verb) => {
+      const trimmed = verb.trim();
+      return trimmed.startsWith("to ") ? trimmed : "to " + trimmed;
+    })
+    .join(", ");
+};
