@@ -1,11 +1,15 @@
 import { Router } from "express";
 import { prisma } from "../../prisma/prisma.js";
 import { z } from "zod";
+import type { Language, Word } from "@prisma/client";
 
 export const router = Router();
 
 const querySchema = z.object({
-  numOfWords: z.string().max(2, { error: "Must be at most 99 characters" }),
+  numOfWords: z
+    .string()
+    .min(1)
+    .max(2, { error: "Must be at most 99 characters" }),
   language: z.string().min(2).max(2, { error: "Must be exactly 2 characters" }),
 });
 
@@ -18,15 +22,15 @@ router.get("/", async (req, res) => {
   const { numOfWords, language } = parseResult.data;
   try {
     // Look up language in Language table
-    const lang = await prisma.language.findUnique({
+    const lang: Language | null = await prisma.language.findUnique({
       where: { value: language },
     });
     if (!lang) {
       return res
         .status(400)
-        .json({ error: `Language '${language}' not found` });
+        .json({ error: `Language '${language}' not found in database` });
     }
-    const words = await prisma.word.findMany({
+    const words: Word[] = await prisma.word.findMany({
       where: { languageId: lang.id },
       take: Number(numOfWords),
       orderBy: { id: "asc" },

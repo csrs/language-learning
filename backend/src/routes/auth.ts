@@ -60,7 +60,7 @@ router.post("/register", async (req, res) => {
       data: {
         username,
         email,
-        password_hash: await createPasswordHash(password),
+        passwordHash: await createPasswordHash(password),
       },
       select: {
         id: true,
@@ -103,7 +103,7 @@ router.post("/login", async (req, res) => {
       id: true,
       username: true,
       email: true,
-      password_hash: true,
+      passwordHash: true,
     },
   });
 
@@ -113,7 +113,7 @@ router.post("/login", async (req, res) => {
     });
   }
 
-  const passwordStatus = await getIsPasswordValid(password, user.password_hash);
+  const passwordStatus = await getIsPasswordValid(password, user.passwordHash);
 
   if (!passwordStatus) {
     return res.status(401).json({

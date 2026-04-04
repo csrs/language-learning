@@ -7,6 +7,7 @@ import { prisma } from "../prisma/prisma.js";
 import { createApp } from "./app.js";
 import { SESSION_COOKIE_NAME } from "./lib/session.js";
 import { createPasswordHash } from "./lib/password.js";
+import { getRequiredSessionCookie, postJson } from "./utils/testUtils.ts";
 
 vi.mock("../prisma/prisma.js", () => ({
   prisma: {
@@ -76,7 +77,7 @@ describe("POST /api/auth/register", () => {
       email: "ada@example.com",
     } as never);
 
-    const response = await postJson("/api/auth/register", {
+    const response = await postJson(baseUrl, "/api/auth/register", {
       username: " Ada ",
       email: " ADA@example.com ",
       password: "super-secret",
@@ -104,14 +105,14 @@ describe("POST /api/auth/register", () => {
         email: true,
       },
     });
-    expect(createArgs?.data.password_hash).toMatch(
+    expect(createArgs?.data.passwordHash).toMatch(
       /^scrypt:[0-9a-f]+:[0-9a-f]+$/i,
     );
-    expect(createArgs?.data.password_hash).not.toBe("super-secret");
+    expect(createArgs?.data.passwordHash).not.toBe("super-secret");
   });
 
   it("returns 400 when a required field is missing", async () => {
-    const response = await postJson("/api/auth/register", {
+    const response = await postJson(baseUrl, "/api/auth/register", {
       username: "Ada",
       email: "ada@example.com",
     });
@@ -135,7 +136,7 @@ describe("POST /api/auth/register", () => {
       }),
     );
 
-    const response = await postJson("/api/auth/register", {
+    const response = await postJson(baseUrl, "/api/auth/register", {
       username: "Ada",
       email: "ada@example.com",
       password: "super-secret",
@@ -156,7 +157,7 @@ describe("POST /api/auth/register", () => {
       }),
     );
 
-    const response = await postJson("/api/auth/register", {
+    const response = await postJson(baseUrl, "/api/auth/register", {
       username: "Ada",
       email: "ada@example.com",
       password: "super-secret",
@@ -171,7 +172,7 @@ describe("POST /api/auth/register", () => {
   it("returns 500 when user creation throws an unexpected error", async () => {
     prismaMock.user.create.mockRejectedValueOnce(new Error("database offline"));
 
-    const response = await postJson("/api/auth/register", {
+    const response = await postJson(baseUrl, "/api/auth/register", {
       username: "Ada",
       email: "ada@example.com",
       password: "super-secret",
@@ -191,10 +192,10 @@ describe("POST /api/auth/login", () => {
       id: 7,
       username: "Ada",
       email: "ada@example.com",
-      password_hash: await createPasswordHash("correct-password"),
+      passwordHash: await createPasswordHash("correct-password"),
     });
 
-    const response = await postJson("/api/auth/login", {
+    const response = await postJson(baseUrl, "/api/auth/login", {
       username: "Ada",
       password: "correct-password",
     });
@@ -217,13 +218,13 @@ describe("POST /api/auth/login", () => {
         id: true,
         username: true,
         email: true,
-        password_hash: true,
+        passwordHash: true,
       },
     });
   });
 
   it("returns 400 when username or password is missing", async () => {
-    const response = await postJson("/api/auth/login", {
+    const response = await postJson(baseUrl, "/api/auth/login", {
       username: "Ada",
     });
 
@@ -237,7 +238,7 @@ describe("POST /api/auth/login", () => {
   it("returns 401 when the user does not exist", async () => {
     prismaMock.user.findUnique.mockResolvedValueOnce(null);
 
-    const response = await postJson("/api/auth/login", {
+    const response = await postJson(baseUrl, "/api/auth/login", {
       username: "Ada",
       password: "correct-password",
     });
@@ -253,10 +254,10 @@ describe("POST /api/auth/login", () => {
       id: 7,
       username: "Ada",
       email: "ada@example.com",
-      password_hash: await createPasswordHash("correct-password"),
+      passwordHash: await createPasswordHash("correct-password"),
     });
 
-    const response = await postJson("/api/auth/login", {
+    const response = await postJson(baseUrl, "/api/auth/login", {
       username: "Ada",
       password: "wrong-password",
     });
@@ -272,14 +273,14 @@ describe("POST /api/auth/login", () => {
       id: 7,
       username: "Ada",
       email: "ada@example.com",
-      password_hash: await createPasswordHash("correct-password"),
+      passwordHash: await createPasswordHash("correct-password"),
     };
 
     prismaMock.user.findUnique
       .mockResolvedValueOnce(user as never)
       .mockResolvedValueOnce(user as never);
 
-    const response1 = await postJson("/api/auth/login", {
+    const response1 = await postJson(baseUrl, "/api/auth/login", {
       username: "Ada",
       password: "correct-password",
     });
@@ -287,6 +288,7 @@ describe("POST /api/auth/login", () => {
     const firstSessionCookie = getRequiredSessionCookie(response1);
 
     const response2 = await postJson(
+      baseUrl,
       "/api/auth/login",
       {
         username: "Ada",
@@ -313,7 +315,7 @@ describe("me routes", () => {
         id: 7,
         username: "Ada",
         email: "ada@example.com",
-        password_hash: await createPasswordHash("correct-password"),
+        passwordHash: await createPasswordHash("correct-password"),
       })
       .mockResolvedValueOnce({
         id: 7,
@@ -325,7 +327,7 @@ describe("me routes", () => {
       expiresAt: new Date(Date.now() + 60_000),
     } as never);
 
-    const loginResponse = await postJson("/api/auth/login", {
+    const loginResponse = await postJson(baseUrl, "/api/auth/login", {
       username: "Ada",
       password: "correct-password",
     });
@@ -545,10 +547,10 @@ describe("me routes", () => {
       id: 7,
       username: "Ada",
       email: "ada@example.com",
-      password_hash: await createPasswordHash("correct-password"),
+      passwordHash: await createPasswordHash("correct-password"),
     });
 
-    const loginResponse = await postJson("/api/auth/login", {
+    const loginResponse = await postJson(baseUrl, "/api/auth/login", {
       username: "Ada",
       password: "correct-password",
     });
@@ -578,36 +580,3 @@ describe("app middleware", () => {
     });
   });
 });
-
-// Test helpers keep the scenarios short and focused on behavior.
-const postJson = async (
-  path: string,
-  body: unknown,
-  options: RequestInit = {},
-) => {
-  const headers = new Headers(options.headers);
-  headers.set("Content-Type", "application/json");
-
-  return fetch(`${baseUrl}${path}`, {
-    ...options,
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-  });
-};
-
-const getRequiredSessionCookie = (response: Response): string => {
-  const setCookieHeader = response.headers.get("set-cookie");
-
-  if (!setCookieHeader) {
-    throw new Error("Expected a Set-Cookie header");
-  }
-
-  const firstCookiePart = setCookieHeader.split(";")[0];
-
-  if (!firstCookiePart) {
-    throw new Error("Expected a session cookie value");
-  }
-
-  return firstCookiePart;
-};

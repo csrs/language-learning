@@ -9,7 +9,7 @@ describe("getWords", () => {
         new Response(JSON.stringify(mockWords), { status: 200 }),
       );
 
-    const result = await getWords(5, "en");
+    const result = await getWords("5", "en");
 
     expect(fetchSpy).toHaveBeenCalledWith(
       "/api/words?numOfWords=5&language=en",
@@ -22,6 +22,6 @@ describe("getWords", () => {
       new Response(null, { status: 400 }),
     );
 
-    await expect(getWords(5, "en")).rejects.toThrow("Failed to fetch words");
+    await expect(getWords("5", "en")).rejects.toThrow("Failed to fetch words");
   });
 });

@@ -61,7 +61,7 @@ async function processBatch(
       create: {
         value: row.base_word,
         languageId: baseLang.id,
-        frequencyCount: Number(row.id),
+        frequencyRank: Number(row.id),
       },
     });
 

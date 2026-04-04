@@ -1,7 +1,7 @@
-export async function getWords(numOfWords: number, language: string) {
+export async function getWords(numOfWords: string) {
   const params = new URLSearchParams({
-    numOfWords: numOfWords.toString(),
-    language,
+    numOfWords: numOfWords,
+    language: "de",
   });
   const response = await fetch(`/api/words?${params.toString()}`);
   if (!response.ok) {

@@ -41,6 +41,7 @@ In Supabase:
 ### Rollback a failed migration in Supabase
 
 1. `DATABASE_URL="<DIRECT_URL_FOR_SUPABASE from backend/.env>" npx prisma migrate resolve --rolled-back "<name-of-migration"` https://www.prisma.io/docs/orm/prisma-migrate/workflows/patching-and-hotfixing#failed-migration
+2. `DATABASE_URL="<DIRECT_URL_FOR_SUPABASE from backend/.env>" npx prisma migrate deploy`
 
 ### Apply data to Supabase database
 

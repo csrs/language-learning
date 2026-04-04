@@ -3,10 +3,15 @@ import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import InputAdornment from "@mui/material/InputAdornment";
+
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { useAuth } from "../../context/AuthContext";
 import { registerSchema } from "../../validation/schemas";
+import { IconButton, OutlinedInput } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 export const Register = () => {
   const [username, setUsername] = useState("");
@@ -17,6 +22,8 @@ export const Register = () => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [formError, setFormError] = useState("");
+  const [shouldShowPassword, setShouldShowPassword] = useState(true);
+
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -41,7 +48,7 @@ export const Register = () => {
     setIsSubmitting(true);
     try {
       await register(username.trim(), email.trim(), password);
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Registration failed");
     } finally {
@@ -87,13 +94,34 @@ export const Register = () => {
         />
         <TextField
           label="Password"
-          type="password"
+          type={shouldShowPassword ? "text" : "password"}
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
           error={!!passwordError}
           helperText={passwordError || "Password must be at least 8 characters"}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={
+                      shouldShowPassword
+                        ? "hide the password"
+                        : "display the password"
+                    }
+                    onClick={() => setShouldShowPassword((show) => !show)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseUp={(e) => e.preventDefault()}
+                    edge="end"
+                  >
+                    {shouldShowPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
         <Button
           type="submit"

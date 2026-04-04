@@ -3,10 +3,15 @@ import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import InputAdornment from "@mui/material/InputAdornment";
+
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { useAuth } from "../../context/AuthContext";
 import { loginSchema } from "../../validation/schemas";
+import { IconButton, OutlinedInput } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
@@ -15,6 +20,7 @@ export const Login = () => {
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [formError, setFormError] = useState("");
+  const [shouldShowPassword, setShouldShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -44,6 +50,7 @@ export const Login = () => {
       setIsSubmitting(false);
     }
   };
+
   return (
     <Paper sx={{ maxWidth: 400, mx: "auto", mt: 4, p: 3 }} elevation={3}>
       <Typography variant="h5" align="center" gutterBottom>
@@ -71,13 +78,34 @@ export const Login = () => {
         />
         <TextField
           label="Password"
-          type="password"
+          type={shouldShowPassword ? "text" : "password"}
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
           error={!!passwordError}
           helperText={passwordError}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={
+                      shouldShowPassword
+                        ? "hide the password"
+                        : "display the password"
+                    }
+                    onClick={() => setShouldShowPassword((show) => !show)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseUp={(e) => e.preventDefault()}
+                    edge="end"
+                  >
+                    {shouldShowPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
         />
         <Button
           type="submit"

@@ -49,6 +49,9 @@ export const EditProfile = () => {
   };
 
   useEffect(() => {
+    // This is inside a useEffect because user comes from the 'GET me' endpoint called in AuthContext, and that endpoint is async.
+    // We need to wait to get a result from the endpoint, but the username and email states in this component won't update after
+    // the user is initialized. So we ned to have them update inside a useEffect.
     if (user) {
       setUsername(user.username || "");
       setEmail(user.email || "");
