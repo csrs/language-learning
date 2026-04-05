@@ -7,7 +7,7 @@ import { prisma } from "../prisma/prisma.js";
 import { createApp } from "./app.js";
 import { SESSION_COOKIE_NAME } from "./lib/session.js";
 import { createPasswordHash } from "./lib/password.js";
-import { getRequiredSessionCookie, postJson } from "./utils/testUtils.ts";
+import { getRequiredSessionCookie, postJson } from "./utils/testUtils.js";
 
 vi.mock("../prisma/prisma.js", () => ({
   prisma: {

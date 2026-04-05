@@ -4,7 +4,7 @@ import type { AddressInfo } from "node:net";
 import { createApp } from "../app.js";
 import { prisma } from "../../prisma/prisma.js";
 import type { Word } from "@prisma/client";
-import { getJson } from "../utils/testUtils.ts";
+import { getJson } from "../utils/testUtils.js";
 
 vi.mock("../../prisma/prisma", () => ({
   prisma: {

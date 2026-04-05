@@ -1,5 +1,5 @@
 import { type Language } from "@prisma/client";
-import { prisma } from "../../../prisma/prisma.ts";
+import { prisma } from "../../../prisma/prisma.js";
 
 export interface LanguageTable {
   baseLang: Language;

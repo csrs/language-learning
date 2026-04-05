@@ -2,17 +2,9 @@ import { prisma } from "../../prisma/prisma.js";
 
 import { createReadStream } from "fs";
 import { parse } from "csv-parse";
-import type {
-  ExampleSentence,
-  Language,
-  PartOfSpeech,
-  Word,
-} from "@prisma/client";
+import type { ExampleSentence, Language } from "@prisma/client";
 import z from "zod";
-import { normalizeVerbsToInfinitive } from "../utils/stringUtils.ts";
-import { seedLanguageTable } from "./oneOffScripts/seedLanguages.ts";
-
-const posMap = new Map<string, number>();
+import { seedLanguageTable } from "./oneOffScripts/seedLanguages.js";
 
 const RowSchema = z.object({
   id: z.string(),
@@ -33,105 +25,187 @@ const RowSchema = z.object({
 
 type RowSchema = z.infer<typeof RowSchema>;
 
-async function addRowsToDatabase(
+export const getUniquePartsOfSpeech = (
+  rows: RowSchema[],
+): string[] | undefined => {
+  // Collect all parts of speech from all rows into a flat array
+  const allPartsOfSpeech = rows.flatMap((r) => [
+    r.target_part_of_speech_1,
+    r.target_part_of_speech_2,
+    r.target_part_of_speech_3,
+  ]);
+
+  // Filter out any invalid or falsey values
+  const filteredPartsOfSpeech: string[] = allPartsOfSpeech
+    .filter((pos) => pos !== "(Reflexive pronoun in the acc.)")
+    .filter((pos): pos is string => Boolean(pos));
+
+  // Create a set to get unique values, then convert back to array
+  const uniquePartsOfSpeech = Array.from(new Set(filteredPartsOfSpeech));
+
+  return uniquePartsOfSpeech.length > 0 ? uniquePartsOfSpeech : undefined;
+};
+
+export const normalizeVerbsToInfinitive = (input: string): string => {
+  return input
+    .split(",")
+    .map((verb) => {
+      const trimmed = verb.trim();
+      return trimmed.startsWith("to ") ? trimmed : "to " + trimmed;
+    })
+    .join(", ");
+};
+
+export const addRowsToDatabase = async (
   rows: RowSchema[],
   batchNumber: number,
   baseLang: Language,
   targetLang: Language,
-) {
+) => {
   console.log(`Processing batch #${batchNumber} (${rows.length} rows)`);
-  for (const row of rows) {
-    // 1. Insert or update the base word
-    const baseWord: Word = await prisma.word.createMany({
-      where: {
-        value_languageId: {
-          value: row.base_word,
-          languageId: baseLang.id,
-        },
-      },
-      update: {},
-      create: {
-        value: row.base_word,
-        languageId: baseLang.id,
-        frequencyRank: Number(row.id),
-      },
-    });
+  // 1. Batch insert base words
+  await prisma.word.createMany({
+    data: rows.map((r) => ({
+      value: r.base_word,
+      languageId: baseLang.id,
+      frequencyRank: Number(r.id),
+    })),
+    skipDuplicates: true,
+  });
 
-    // 2. For each translation set (up to 3)
+  // 2. Batch insert unique parts of speech
+  const uniquePartsOfSpeech = getUniquePartsOfSpeech(rows);
+  if (uniquePartsOfSpeech) {
+    await prisma.partOfSpeech.createMany({
+      data: uniquePartsOfSpeech.map((pos) => ({ value: pos! })),
+      skipDuplicates: true,
+    });
+  }
+
+  // 3. Get all words and parts of speech from DB to resolve IDs
+  const allWords = await prisma.word.findMany({
+    where: { languageId: baseLang.id },
+  });
+  const allPartsOfSpeech = await prisma.partOfSpeech.findMany();
+
+  // 4. Prepare example sentences for batch insert
+  const exampleSentences: Omit<ExampleSentence, "id">[] = [];
+  let targetWords: string[] = [];
+  for (const r of rows) {
     for (let i = 1; i <= 3; i++) {
-      const key1 = `target_part_of_speech_${i}` as keyof RowSchema;
-      const pos = row[key1];
-      const key2 = `base_sentence_${i}` as keyof RowSchema;
-      const baseSentence = row[key2];
-      const key3 = `target_sentence_${i}` as keyof RowSchema;
-      const targetSentence = row[key3];
-      if (!pos || !baseSentence || !targetSentence) {
+      const pos = r[`target_part_of_speech_${i}` as keyof RowSchema];
+      const baseSentence = r[`base_sentence_${i}` as keyof RowSchema];
+      const targetSentence = r[`target_sentence_${i}` as keyof RowSchema];
+      if (!pos || !baseSentence || !targetSentence) continue;
+      // Find wordId and partOfSpeechId
+      const word = allWords.find((w) => w.value === r.base_word);
+      const partOfSpeech = allPartsOfSpeech.find((p) => p.value === pos);
+      if (!word || !partOfSpeech) continue;
+      exampleSentences.push({
+        wordId: word.id,
+        partOfSpeechId: partOfSpeech.id,
+        exampleTarget: baseSentence,
+        exampleBase: targetSentence,
+      });
+
+      // After creating the ExampleSentence (meaning) for the base word:
+      // Collect the corresponding word in the target language
+      const key4 = `target_word_${i}` as keyof RowSchema;
+      let targetWordString = r[key4];
+      if (
+        !targetWordString ||
+        targetWordString === "(past tense)" ||
+        targetWordString === "(future tense)" ||
+        targetWordString === "(passive voice)"
+      ) {
         continue;
       }
+      if (pos === "verb") {
+        targetWordString = normalizeVerbsToInfinitive(targetWordString);
+      }
+      targetWords = [...targetWords, targetWordString];
+    }
+  }
 
-      if (pos && !pos.includes("(")) {
-        let posId = posMap.get(pos);
-        if (posId === undefined) {
-          // Insert or upsert POS in the database
-          const record: PartOfSpeech = await prisma.partOfSpeech.upsert({
-            where: { value: pos },
-            update: {},
-            create: { value: pos },
-          });
-          posId = record.id;
-          posMap.set(pos, posId);
-        }
-        // 3. Create ExampleSentence (meaning) for this word and POS
-        const exampleSentence: ExampleSentence =
-          await prisma.exampleSentence.create({
-            data: {
-              wordId: baseWord.id,
-              partOfSpeechId: posId,
-              exampleTarget: baseSentence,
-              exampleBase: targetSentence,
-            },
-          });
+  // After the loop, batch insert unique target words
+  const uniqueTargetWords = [...new Set(targetWords)];
+  if (uniqueTargetWords.length > 0) {
+    await prisma.word.createMany({
+      data: uniqueTargetWords.map((w) => ({
+        value: w,
+        languageId: targetLang.id,
+      })),
+      skipDuplicates: true,
+    });
+  }
 
-        // After creating the ExampleSentence (meaning) for the base word:
-        // Insert the corresponding word in the target language
-        const key4 = `target_word_${i}` as keyof RowSchema;
-        let targetWordString = row[key4];
-        if (
-          !targetWordString ||
-          targetWordString === "(past tense)" ||
-          targetWordString === "(future tense)" ||
-          targetWordString === "(passive voice)" ||
-          targetWordString === "(Reflexive pronoun in the acc.)"
-        ) {
-          continue;
-        }
-        if (pos === "verb") {
-          targetWordString = normalizeVerbsToInfinitive(targetWordString);
-        }
-        const targetWord: Word = await prisma.word.upsert({
-          where: {
-            value_languageId: {
-              value: targetWordString,
-              languageId: targetLang.id,
-            },
-          },
-          update: {},
-          create: {
-            value: targetWordString,
-            languageId: targetLang.id,
-          },
-        });
+  if (exampleSentences.length > 0) {
+    await prisma.exampleSentence.createMany({
+      data: exampleSentences,
+      skipDuplicates: true,
+    });
+  }
 
-        await prisma.translation.create({
-          data: {
-            exampleSentenceId: exampleSentence.id, // the example sentence that was created in Step 3
-            toWordId: targetWord.id, // the translated word
-          },
+  // 5. Insert translation records linking example sentences and target words
+  // Fetch all example sentences and target words from DB
+  const allExampleSentences = await prisma.exampleSentence.findMany();
+  const allTargetWords = await prisma.word.findMany({
+    where: { languageId: targetLang.id },
+  });
+
+  // Prepare translation records
+  const translationRecords: { exampleSentenceId: number; toWordId: number }[] =
+    [];
+  for (const r of rows) {
+    for (let i = 1; i <= 3; i++) {
+      const pos = r[`target_part_of_speech_${i}` as keyof RowSchema];
+      const baseSentence = r[`base_sentence_${i}` as keyof RowSchema];
+      const targetSentence = r[`target_sentence_${i}` as keyof RowSchema];
+      const key4 = `target_word_${i}` as keyof RowSchema;
+      let targetWordString = r[key4];
+      if (
+        !pos ||
+        !baseSentence ||
+        !targetSentence ||
+        !targetWordString ||
+        targetWordString === "(past tense)" ||
+        targetWordString === "(future tense)" ||
+        targetWordString === "(passive voice)" ||
+        targetWordString === "(Reflexive pronoun in the acc.)"
+      ) {
+        continue;
+      }
+      if (pos === "verb") {
+        targetWordString = normalizeVerbsToInfinitive(targetWordString);
+      }
+      // Find the example sentence and target word by matching fields
+      const exampleSentence = allExampleSentences.find(
+        (e) =>
+          e.exampleTarget === baseSentence &&
+          e.exampleBase === targetSentence &&
+          allWords.find((w) => w.id === e.wordId)?.value === r.base_word &&
+          allPartsOfSpeech.find((p) => p.id === e.partOfSpeechId)?.value ===
+            pos,
+      );
+      const targetWord = allTargetWords.find(
+        (w) => w.value === targetWordString,
+      );
+      if (exampleSentence && targetWord) {
+        translationRecords.push({
+          exampleSentenceId: exampleSentence.id,
+          toWordId: targetWord.id,
         });
       }
     }
   }
-}
+
+  if (translationRecords.length > 0) {
+    await prisma.translation.createMany({
+      data: translationRecords,
+      skipDuplicates: true,
+    });
+  }
+};
 
 // Process the current batch
 const handleBatch = async (
@@ -147,8 +221,6 @@ const handleBatch = async (
       baseLang,
       targetLang,
     );
-    currentBatch = [];
-    currentBatchNumber++;
   } catch (err) {
     console.error("Error processing batch:", err);
     throw err;
