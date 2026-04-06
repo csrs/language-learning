@@ -45,5 +45,7 @@ In Supabase:
 
 ### Apply data to Supabase database
 
-1. Change DATABASE_URL in `backend/.env` file to the Supabase Direct connection string
-2. Run `npx tsx <path-to-seeding-script>`
+1. `cd backend`
+2. Change `DATABASE_URL` in `backend/.env` to the Supabase Direct connection string
+3. Run `npx tsx <path-to-seeding-script>` to append only new import data
+4. Run `npx tsx <path-to-seeding-script> --clear-first` to delete existing import tables first and then reseed them

@@ -1,6 +1,8 @@
 import { prisma } from "../../../prisma/prisma.js";
+import { Prisma } from "@prisma/client";
 
 import { createReadStream } from "fs";
+import { pathToFileURL } from "url";
 import { parse } from "csv-parse";
 import type {
   ExampleSentence,
@@ -30,6 +32,61 @@ export const RowSchema = z.object({
 });
 
 export type RowSchema = z.infer<typeof RowSchema>;
+
+export interface BatchImportStats {
+  processedRows: number;
+  insertedBaseWords: number;
+  insertedPartsOfSpeech: number;
+  insertedTargetWords: number;
+  insertedExampleSentences: number;
+  insertedTranslations: number;
+}
+
+export interface ImportStats extends BatchImportStats {
+  batchesProcessed: number;
+}
+
+const CLEAR_FIRST_FLAG = "--clear-first";
+const RESET_IMPORT_TABLES_SQL = Prisma.sql`
+  TRUNCATE TABLE "Translation", "ExampleSentence", "Word", "PartOfSpeech", "Language"
+  RESTART IDENTITY
+`;
+
+const createEmptyImportStats = (): ImportStats => ({
+  processedRows: 0,
+  insertedBaseWords: 0,
+  insertedPartsOfSpeech: 0,
+  insertedTargetWords: 0,
+  insertedExampleSentences: 0,
+  insertedTranslations: 0,
+  batchesProcessed: 0,
+});
+
+const addBatchStats = (totals: ImportStats, batchStats: BatchImportStats) => {
+  totals.processedRows += batchStats.processedRows;
+  totals.insertedBaseWords += batchStats.insertedBaseWords;
+  totals.insertedPartsOfSpeech += batchStats.insertedPartsOfSpeech;
+  totals.insertedTargetWords += batchStats.insertedTargetWords;
+  totals.insertedExampleSentences += batchStats.insertedExampleSentences;
+  totals.insertedTranslations += batchStats.insertedTranslations;
+  totals.batchesProcessed += 1;
+};
+
+const logImportSummary = (stats: ImportStats, durationMs: number) => {
+  const timePerRowMs =
+    stats.processedRows > 0 ? durationMs / stats.processedRows : 0;
+
+  console.log(
+    `Processed ${stats.processedRows} rows in ${durationMs} ms (${timePerRowMs.toFixed(2)} ms/row) across ${stats.batchesProcessed} batch(es)`,
+  );
+  console.log(
+    `Inserted ${stats.insertedBaseWords} base words, ${stats.insertedTargetWords} target words, ${stats.insertedPartsOfSpeech} parts of speech, ${stats.insertedExampleSentences} example sentences, and ${stats.insertedTranslations} translations.`,
+  );
+};
+
+export const getShouldClearTables = (
+  argv: string[] = process.argv.slice(2),
+): boolean => argv.includes(CLEAR_FIRST_FLAG);
 
 export const getUniquePartsOfSpeech = (
   rows: RowSchema[],
@@ -67,11 +124,17 @@ export const addRowsToDatabase = async (
   batchNumber: number,
   baseLang: Language,
   targetLang: Language,
-) => {
+): Promise<BatchImportStats> => {
   console.log(`Processing batch #${batchNumber} (${rows.length} rows)`);
+  let insertedBaseWords = 0;
+  let insertedPartsOfSpeech = 0;
+  let insertedTargetWords = 0;
+  let insertedExampleSentences = 0;
+  let insertedTranslations = 0;
+
   // 1. Batch insert base words
   if (rows.length > 0) {
-    await prisma.word.createMany({
+    const result = await prisma.word.createMany({
       data: rows.map((r) => ({
         value: r.base_word,
         languageId: baseLang.id,
@@ -79,15 +142,17 @@ export const addRowsToDatabase = async (
       })),
       skipDuplicates: true,
     });
+    insertedBaseWords = result.count;
   }
 
   // 2. Batch insert unique parts of speech
   const uniquePartsOfSpeech = getUniquePartsOfSpeech(rows);
   if (uniquePartsOfSpeech && uniquePartsOfSpeech.length > 0) {
-    await prisma.partOfSpeech.createMany({
+    const result = await prisma.partOfSpeech.createMany({
       data: uniquePartsOfSpeech.map((pos) => ({ value: pos })),
       skipDuplicates: true,
     });
+    insertedPartsOfSpeech = result.count;
   }
 
   // 3. Get all words and parts of speech from DB to resolve IDs
@@ -138,21 +203,23 @@ export const addRowsToDatabase = async (
   // After the loop, batch insert unique target words
   const uniqueTargetWords = [...new Set(targetWords)];
   if (uniqueTargetWords.length > 0) {
-    await prisma.word.createMany({
+    const result = await prisma.word.createMany({
       data: uniqueTargetWords.map((w) => ({
         value: w,
         languageId: targetLang.id,
       })),
       skipDuplicates: true,
     });
+    insertedTargetWords = result.count;
   }
 
   // Batch insert example sentences
   if (exampleSentences.length > 0) {
-    await prisma.exampleSentence.createMany({
+    const result = await prisma.exampleSentence.createMany({
       data: exampleSentences,
       skipDuplicates: true,
     });
+    insertedExampleSentences = result.count;
   }
 
   // 5. Insert translation records linking example sentences and target words
@@ -209,11 +276,21 @@ export const addRowsToDatabase = async (
   }
 
   if (translationRecords.length > 0) {
-    await prisma.translation.createMany({
+    const result = await prisma.translation.createMany({
       data: translationRecords,
       skipDuplicates: true,
     });
+    insertedTranslations = result.count;
   }
+
+  return {
+    processedRows: rows.length,
+    insertedBaseWords,
+    insertedPartsOfSpeech,
+    insertedTargetWords,
+    insertedExampleSentences,
+    insertedTranslations,
+  };
 };
 
 // Process the current batch
@@ -222,9 +299,9 @@ const handleBatch = async (
   currentBatchNumber: number,
   baseLang: Language,
   targetLang: Language,
-) => {
+): Promise<BatchImportStats> => {
   try {
-    await addRowsToDatabase(
+    return await addRowsToDatabase(
       currentBatch,
       currentBatchNumber,
       baseLang,
@@ -236,104 +313,106 @@ const handleBatch = async (
   }
 };
 
+export const clearImportTables = async (): Promise<void> => {
+  console.warn(
+    "Clear-first mode enabled. Truncating Translation, ExampleSentence, Word, PartOfSpeech, and Language rows and resetting their identities before import.",
+  );
+  await prisma.$executeRaw(RESET_IMPORT_TABLES_SQL);
+  console.log("Import tables cleared.");
+};
+
 // Reads the CSV file, processes in batches, and seeds the database
-const parseInputFile = async () => {
-  return new Promise<void>((resolve, reject) => {
-    (async () => {
-      try {
-        const { baseLang, targetLang } = await seedLanguageTable("de", "en");
+export const parseInputFile = async (): Promise<ImportStats> => {
+  const BATCH_SIZE = 5000;
+  const start = Date.now();
+  const totals = createEmptyImportStats();
 
-        // 3. Prepare to read and process the CSV in batches
-        const stream = createReadStream(
-          "./src/scripts/database/input.csv",
-        ).pipe(parse({ columns: true, delimiter: "," }));
+  try {
+    const { baseLang, targetLang } = await seedLanguageTable("de", "en");
+    const stream = createReadStream("./src/scripts/database/input.csv").pipe(
+      parse({ columns: true, delimiter: "," }),
+    );
 
-        const BATCH_SIZE = 5000;
-        let currentBatch: RowSchema[] = [];
-        let currentBatchNumber = 1;
+    let currentBatch: RowSchema[] = [];
+    let currentBatchNumber = 1;
 
-        // Collect rows into batches as they are read
-
-        const start = Date.now();
-        let totalRowsProcessed = 0;
-
-        stream.on("data", (row) => {
-          const result = RowSchema.safeParse(row);
-          if (!result.success) {
-            console.warn("Skipping invalid row:", row, result.error);
-            return;
-          }
-          currentBatch.push(result.data);
-          // If batch is full, process it
-          if (currentBatch.length === BATCH_SIZE) {
-            stream.pause();
-
-            handleBatch(currentBatch, currentBatchNumber, baseLang, targetLang)
-              .then(() => {
-                totalRowsProcessed += currentBatch.length;
-                currentBatch = [];
-                currentBatchNumber++;
-                stream.resume();
-              })
-              .catch((err) => {
-                stream.destroy();
-                reject(err);
-              });
-          }
-        });
-
-        // When the stream ends, process any remaining rows in the last batch
-        stream.on("end", async () => {
-          if (currentBatch.length > 0) {
-            try {
-              await handleBatch(
-                currentBatch,
-                currentBatchNumber,
-                baseLang,
-                targetLang,
-              );
-              totalRowsProcessed += currentBatch.length;
-              console.log("CSV import complete");
-            } catch (err) {
-              console.error(err);
-              reject(err);
-            }
-          }
-        });
-
-        // Clean up and disconnect from the database
-        stream.on("close", async () => {
-          try {
-            await prisma.$disconnect();
-            resolve();
-            console.log("Stream closed");
-            const end = Date.now();
-            const durationMs = end - start;
-            const timePerRowMs = durationMs / totalRowsProcessed;
-            console.log(
-              `Processed ${totalRowsProcessed} rows in ${durationMs} ms (${timePerRowMs.toFixed(2)} ms/row)`,
-            );
-          } catch (err) {
-            reject(err);
-          }
-        });
-
-        // Handle errors
-        stream.on("error", (err) => {
-          reject(err);
-        });
-      } catch (err) {
-        reject(err);
+    for await (const row of stream) {
+      const result = RowSchema.safeParse(row);
+      if (!result.success) {
+        console.warn("Skipping invalid row:", row, result.error);
+        continue;
       }
-    })().catch(reject);
-  });
+
+      currentBatch.push(result.data);
+
+      if (currentBatch.length === BATCH_SIZE) {
+        const batchStats = await handleBatch(
+          currentBatch,
+          currentBatchNumber,
+          baseLang,
+          targetLang,
+        );
+        addBatchStats(totals, batchStats);
+        currentBatch = [];
+        currentBatchNumber++;
+      }
+    }
+
+    if (currentBatch.length > 0) {
+      const batchStats = await handleBatch(
+        currentBatch,
+        currentBatchNumber,
+        baseLang,
+        targetLang,
+      );
+      addBatchStats(totals, batchStats);
+    }
+
+    console.log("CSV import complete");
+    return totals;
+  } finally {
+    await prisma.$disconnect();
+    console.log("Database disconnected");
+    logImportSummary(totals, Date.now() - start);
+  }
 };
 
-const seed = async () => {
-  await parseInputFile();
+const isMainModule = (): boolean => {
+  // https://nodejs.org/api/modules.html#accessing-the-main-module
+
+  // process.argv is an array of command-line arguments. The first element is the path to the Node.js executable,
+  // and the second element is the path to the JavaScript file being executed. If there is no second element,
+  // it means the script is being run in a test environment or similar environment, so it returns false.
+  // https://nodejs.org/download/release/latest-v24.x/docs/api/esm.html#importmetaurl
+  const entryPoint = process.argv[1];
+
+  if (!entryPoint) {
+    return false;
+  }
+
+  // import.meta.url is defined exactly the same as it is in browsers providing the URL of the current module file.
+  // https://nodejs.org/download/release/latest-v24.x/docs/api/esm.html#importmetaurl
+
+  // pathToFileURL converts a filesystem path to a file URL. We compare this to import.meta.url to determine if this module is the entry point.
+  // https://nodejs.org/api/url.html#urlpathtofileurlpath-options
+  return import.meta.url === pathToFileURL(entryPoint).href;
 };
 
-seed().catch((e) => {
-  console.error("Seed failed:", e);
-  process.exit(1);
-});
+if (isMainModule()) {
+  const shouldClearTables = getShouldClearTables();
+
+  console.log(
+    `Starting Anki import. Clear-first mode: ${shouldClearTables ? "enabled" : "disabled"}.`,
+  );
+
+  try {
+    if (shouldClearTables) {
+      await clearImportTables();
+    }
+
+    await parseInputFile();
+  } catch (e) {
+    console.error("Seed failed:", e);
+    process.exit(1);
+  }
+}

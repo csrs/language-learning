@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { prisma } from "../../../../prisma/prisma.js";
 import type { Language } from "@prisma/client";
-import { addRowsToDatabase } from "../ankiToDatabase.js";
+import {
+  addRowsToDatabase,
+  clearImportTables,
+  getShouldClearTables,
+} from "../ankiToDatabase.js";
 
 vi.mock("../../../../prisma/prisma.js", async () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -10,6 +14,7 @@ vi.mock("../../../../prisma/prisma.js", async () => {
     ...actual,
     prisma: {
       ...actual.prisma,
+      $executeRaw: vi.fn().mockResolvedValue(0),
       word: {
         ...actual.prisma.word,
         createMany: vi.fn().mockResolvedValue({ count: 0 }),
@@ -289,5 +294,34 @@ describe("addRowsToDatabase", () => {
       ],
       skipDuplicates: true,
     });
+  });
+});
+
+describe("clearImportTables", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("truncates only the import tables and resets identities", async () => {
+    await clearImportTables();
+
+    expect(prisma.$executeRaw).toHaveBeenCalledTimes(1);
+    const [sqlArg] = vi.mocked(prisma.$executeRaw).mock.calls[0];
+    const sql = sqlArg as { strings: readonly string[]; values: unknown[] };
+
+    expect(sql.values).toEqual([]);
+    expect(sql.strings[0].replace(/\s+/g, " ").trim()).toBe(
+      'TRUNCATE TABLE "Translation", "ExampleSentence", "Word", "PartOfSpeech", "Language" RESTART IDENTITY',
+    );
+  });
+});
+
+describe("getShouldClearTables", () => {
+  it("returns true when --clear-first is present", () => {
+    expect(getShouldClearTables(["--clear-first"])).toBe(true);
+  });
+
+  it("returns false when --clear-first is absent", () => {
+    expect(getShouldClearTables([""])).toBe(false);
   });
 });
