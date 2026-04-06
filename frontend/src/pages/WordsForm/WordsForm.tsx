@@ -5,7 +5,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import { getWords } from "../../api/getWords";
+import { getWords, type Word } from "../../api/getWords";
 import { Chip } from "@mui/material";
 import styles from "./WordsForm.module.css";
 
@@ -13,7 +13,7 @@ export const WordsForm = () => {
   const [numOfWords, setNumOfWords] = useState<string>("10");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
-  const [words, setWords] = useState<any[]>([]);
+  const [words, setWords] = useState<Word[]>([]);
   const [numOfWordsError, setNumOfWordsError] = useState("");
 
   const schema = z.object({

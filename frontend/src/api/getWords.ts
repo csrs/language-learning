@@ -1,4 +1,11 @@
-export async function getWords(numOfWords: string) {
+export interface Word {
+  id: number;
+  value: string;
+  languageId: number;
+  frequencyRank: number | null;
+}
+
+export const getWords = async (numOfWords: string): Promise<Word[]> => {
   const params = new URLSearchParams({
     numOfWords: numOfWords,
     language: "de",
@@ -11,4 +18,4 @@ export async function getWords(numOfWords: string) {
     throw new Error(body?.error ?? "Failed to fetch words");
   }
   return response.json();
-}
+};

@@ -10,7 +10,7 @@
     "types": ["node"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": false
   },
   "exclude": [
     "dist/**/*.*",

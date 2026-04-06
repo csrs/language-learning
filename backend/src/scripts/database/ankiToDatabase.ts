@@ -1,12 +1,18 @@
-import { prisma } from "../../prisma/prisma.js";
+import { prisma } from "../../../prisma/prisma.js";
 
 import { createReadStream } from "fs";
 import { parse } from "csv-parse";
-import type { ExampleSentence, Language } from "@prisma/client";
+import type {
+  ExampleSentence,
+  Language,
+  PartOfSpeech,
+  Translation,
+  Word,
+} from "@prisma/client";
 import z from "zod";
-import { seedLanguageTable } from "./oneOffScripts/seedLanguages.js";
+import { seedLanguageTable } from "./seedLanguages.js";
 
-const RowSchema = z.object({
+export const RowSchema = z.object({
   id: z.string(),
   base_word: z.string(),
   target_part_of_speech_1: z.string(),
@@ -23,7 +29,7 @@ const RowSchema = z.object({
   target_sentence_3: z.string().optional(),
 });
 
-type RowSchema = z.infer<typeof RowSchema>;
+export type RowSchema = z.infer<typeof RowSchema>;
 
 export const getUniquePartsOfSpeech = (
   rows: RowSchema[],
@@ -64,33 +70,35 @@ export const addRowsToDatabase = async (
 ) => {
   console.log(`Processing batch #${batchNumber} (${rows.length} rows)`);
   // 1. Batch insert base words
-  await prisma.word.createMany({
-    data: rows.map((r) => ({
-      value: r.base_word,
-      languageId: baseLang.id,
-      frequencyRank: Number(r.id),
-    })),
-    skipDuplicates: true,
-  });
+  if (rows.length > 0) {
+    await prisma.word.createMany({
+      data: rows.map((r) => ({
+        value: r.base_word,
+        languageId: baseLang.id,
+        frequencyRank: Number(r.id),
+      })),
+      skipDuplicates: true,
+    });
+  }
 
   // 2. Batch insert unique parts of speech
   const uniquePartsOfSpeech = getUniquePartsOfSpeech(rows);
-  if (uniquePartsOfSpeech) {
+  if (uniquePartsOfSpeech && uniquePartsOfSpeech.length > 0) {
     await prisma.partOfSpeech.createMany({
-      data: uniquePartsOfSpeech.map((pos) => ({ value: pos! })),
+      data: uniquePartsOfSpeech.map((pos) => ({ value: pos })),
       skipDuplicates: true,
     });
   }
 
   // 3. Get all words and parts of speech from DB to resolve IDs
-  const allWords = await prisma.word.findMany({
+  const allWords: Word[] = await prisma.word.findMany({
     where: { languageId: baseLang.id },
   });
-  const allPartsOfSpeech = await prisma.partOfSpeech.findMany();
+  const allPartsOfSpeech: PartOfSpeech[] = await prisma.partOfSpeech.findMany();
 
   // 4. Prepare example sentences for batch insert
   const exampleSentences: Omit<ExampleSentence, "id">[] = [];
-  let targetWords: string[] = [];
+  const targetWords: string[] = [];
   for (const r of rows) {
     for (let i = 1; i <= 3; i++) {
       const pos = r[`target_part_of_speech_${i}` as keyof RowSchema];
@@ -123,7 +131,7 @@ export const addRowsToDatabase = async (
       if (pos === "verb") {
         targetWordString = normalizeVerbsToInfinitive(targetWordString);
       }
-      targetWords = [...targetWords, targetWordString];
+      targetWords.push(targetWordString);
     }
   }
 
@@ -139,6 +147,7 @@ export const addRowsToDatabase = async (
     });
   }
 
+  // Batch insert example sentences
   if (exampleSentences.length > 0) {
     await prisma.exampleSentence.createMany({
       data: exampleSentences,
@@ -147,15 +156,14 @@ export const addRowsToDatabase = async (
   }
 
   // 5. Insert translation records linking example sentences and target words
-  // Fetch all example sentences and target words from DB
-  const allExampleSentences = await prisma.exampleSentence.findMany();
-  const allTargetWords = await prisma.word.findMany({
+  const allExampleSentences: ExampleSentence[] =
+    await prisma.exampleSentence.findMany();
+  const allTargetWords: Word[] = await prisma.word.findMany({
     where: { languageId: targetLang.id },
   });
 
   // Prepare translation records
-  const translationRecords: { exampleSentenceId: number; toWordId: number }[] =
-    [];
+  const translationRecords: Omit<Translation, "id">[] = [];
   for (const r of rows) {
     for (let i = 1; i <= 3; i++) {
       const pos = r[`target_part_of_speech_${i}` as keyof RowSchema];
@@ -170,15 +178,14 @@ export const addRowsToDatabase = async (
         !targetWordString ||
         targetWordString === "(past tense)" ||
         targetWordString === "(future tense)" ||
-        targetWordString === "(passive voice)" ||
-        targetWordString === "(Reflexive pronoun in the acc.)"
+        targetWordString === "(passive voice)"
       ) {
         continue;
       }
       if (pos === "verb") {
         targetWordString = normalizeVerbsToInfinitive(targetWordString);
       }
-      // Find the example sentence and target word by matching fields
+      // Find the example sentence by matching fields
       const exampleSentence = allExampleSentences.find(
         (e) =>
           e.exampleTarget === baseSentence &&
@@ -187,6 +194,8 @@ export const addRowsToDatabase = async (
           allPartsOfSpeech.find((p) => p.id === e.partOfSpeechId)?.value ===
             pos,
       );
+
+      // Find the target word by matching fields
       const targetWord = allTargetWords.find(
         (w) => w.value === targetWordString,
       );
@@ -239,7 +248,7 @@ const parseInputFile = async () => {
           parse({ columns: true, delimiter: "," }),
         );
 
-        const BATCH_SIZE = 100;
+        const BATCH_SIZE = 5000;
         let currentBatch: RowSchema[] = [];
         let currentBatchNumber = 1;
 
@@ -249,7 +258,12 @@ const parseInputFile = async () => {
         let totalRowsProcessed = 0;
 
         stream.on("data", (row) => {
-          currentBatch.push(row);
+          const result = RowSchema.safeParse(row);
+          if (!result.success) {
+            console.warn("Skipping invalid row:", row, result.error);
+            return;
+          }
+          currentBatch.push(result.data);
           // If batch is full, process it
           if (currentBatch.length === BATCH_SIZE) {
             stream.pause();

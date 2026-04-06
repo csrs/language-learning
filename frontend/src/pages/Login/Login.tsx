@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { useAuth } from "../../context/AuthContext";
 import { loginSchema } from "../../validation/schemas";
-import { IconButton, OutlinedInput } from "@mui/material";
+import { IconButton } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
