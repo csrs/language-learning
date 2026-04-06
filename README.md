@@ -46,4 +46,4 @@ In Supabase:
 ### Apply data to Supabase database
 
 1. Change DATABASE_URL in `backend/.env` file to the Supabase Direct connection string
-2. Run `npx tsx src/scripts/ankiToDatabase.ts` or whatever script populates the tables
+2. Run `npx tsx <path-to-seeding-script>`

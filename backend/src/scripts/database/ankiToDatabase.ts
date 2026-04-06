@@ -244,9 +244,9 @@ const parseInputFile = async () => {
         const { baseLang, targetLang } = await seedLanguageTable("de", "en");
 
         // 3. Prepare to read and process the CSV in batches
-        const stream = createReadStream("./src/scripts/input.csv").pipe(
-          parse({ columns: true, delimiter: "," }),
-        );
+        const stream = createReadStream(
+          "./src/scripts/database/input.csv",
+        ).pipe(parse({ columns: true, delimiter: "," }));
 
         const BATCH_SIZE = 5000;
         let currentBatch: RowSchema[] = [];
