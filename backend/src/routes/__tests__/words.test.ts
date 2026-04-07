@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
-import { createApp } from "../app.js";
-import { prisma } from "../../prisma/prisma.js";
+import { createApp } from "../../app.js";
+import { prisma } from "../../../prisma/prisma.js";
 import type { Word } from "@prisma/client";
-import { getJson } from "../utils/testUtils.js";
+import { getJson } from "../../utils/testUtils.js";
 
-vi.mock("../../prisma/prisma", () => ({
+vi.mock("../../../prisma/prisma", () => ({
   prisma: {
     language: {
       findUnique: vi.fn(),
@@ -48,11 +48,14 @@ afterEach(async () => {
 });
 
 describe("words routes", () => {
-  it("returns 400 if query params are missing", async () => {
+  it("returns 400 with validation errors if query params are missing", async () => {
     const res = await getJson(baseUrl, "/api/words");
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body).toHaveProperty("error");
+    expect(body).toHaveProperty("formErrors");
+    expect(body).toHaveProperty("fieldErrors");
+    expect(body.fieldErrors).toHaveProperty("numOfWords");
+    expect(body.fieldErrors).toHaveProperty("language");
   });
 
   it("returns 400 if language is not found", async () => {
@@ -60,7 +63,7 @@ describe("words routes", () => {
     const res = await getJson(baseUrl, "/api/words?numOfWords=2&language=zz");
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body).toHaveProperty("error");
+    expect(body).toHaveProperty("error", "Language 'zz' not found in database");
   });
 
   it("returns words for valid params", async () => {

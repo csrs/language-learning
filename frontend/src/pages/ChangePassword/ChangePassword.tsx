@@ -7,25 +7,28 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { changePassword } from "../../api/changePassword";
 import { changePasswordSchema } from "../../validation/schemas";
+import z from "zod";
 
 export const ChangePassword = () => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
-  const [formError, setFormError] = useState("");
+  const [passwordError, setPasswordError] = useState<string | undefined>(
+    undefined,
+  );
+  const [formError, setFormError] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
 
-  const parsed = changePasswordSchema.safeParse({ password });
-  const isSubmitButtonEnabled = parsed.success;
+  const parsedInput = changePasswordSchema.safeParse({ password });
+  const isSubmitButtonEnabled = parsedInput.success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setPasswordError("");
-    setFormError("");
+    setPasswordError(undefined);
+    setFormError(undefined);
 
-    if (!parsed.success) {
-      const fieldErrors = parsed.error.flatten().fieldErrors;
-      setPasswordError(fieldErrors.password?.[0] ?? "");
+    if (!parsedInput.success) {
+      const flattenedError = z.flattenError(parsedInput.error);
+      setPasswordError(flattenedError.fieldErrors.password?.[0]);
       return;
     }
 

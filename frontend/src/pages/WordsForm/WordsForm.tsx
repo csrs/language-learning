@@ -1,38 +1,39 @@
 import { useState, type FormEvent } from "react";
-import { z } from "zod";
+import z from "zod";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
 import { getWords, type Word } from "../../api/getWords";
 import { Chip } from "@mui/material";
 import styles from "./WordsForm.module.css";
+import { SharedFormPaper } from "../../components/SharedFormPaper/SharedFormPaper";
 
 export const WordsForm = () => {
   const [numOfWords, setNumOfWords] = useState<string>("10");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState("");
+  const [formError, setFormError] = useState<string | undefined>(undefined);
   const [words, setWords] = useState<Word[]>([]);
-  const [numOfWordsError, setNumOfWordsError] = useState("");
+  const [numOfWordsError, setNumOfWordsError] = useState<string | undefined>(
+    undefined,
+  );
 
   const schema = z.object({
     numOfWords: z.string().max(2, { error: "Must be at most 99 characters" }),
   });
 
-  const parsed = schema.safeParse({ numOfWords });
-  const isSubmitButtonEnabled = parsed.success && !isSubmitting;
+  const parsedInput = schema.safeParse({ numOfWords });
+  const isSubmitButtonEnabled = parsedInput.success && !isSubmitting;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormError("");
-    setNumOfWordsError("");
+    setFormError(undefined);
+    setNumOfWordsError(undefined);
     setWords([]);
-    const result = schema.safeParse({ numOfWords });
-    if (!result.success) {
-      const flat = result.error.flatten();
-      setNumOfWordsError(flat.fieldErrors.numOfWords?.[0] ?? "");
-      setFormError(flat.formErrors[0] ?? "");
+    if (!parsedInput.success) {
+      const flattenedError = z.flattenError(parsedInput.error);
+      setNumOfWordsError(flattenedError.fieldErrors.numOfWords?.[0]);
+      setFormError(flattenedError.formErrors[0]);
       return;
     }
     setIsSubmitting(true);
@@ -49,8 +50,8 @@ export const WordsForm = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 4400, mx: "auto", mt: 4 }}>
-      <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
+    <SharedFormPaper maxWidth="100%">
+      <Box sx={{ width: "100%", maxWidth: 4400, mx: "auto" }}>
         <Typography variant="h6" align="center" mb={2}>
           Fetch Words in order of frequency usage in German
         </Typography>
@@ -63,7 +64,7 @@ export const WordsForm = () => {
         <Box
           component="form"
           onSubmit={handleSubmit}
-          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}
         >
           {formError && (
             <Typography color="error" variant="body2">
@@ -97,7 +98,7 @@ export const WordsForm = () => {
             ))}
           </Box>
         )}
-      </Paper>
-    </Box>
+      </Box>
+    </SharedFormPaper>
   );
 };

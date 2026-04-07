@@ -315,7 +315,7 @@ const handleBatch = async (
 
 export const clearImportTables = async (): Promise<void> => {
   console.warn(
-    "Clear-first mode enabled. Truncating Translation, ExampleSentence, Word, PartOfSpeech, and Language rows and resetting their identities before import.",
+    "Clear-first mode enabled. Truncating Translation, ExampleSentence, Word, PartOfSpeech, and Language rows and resetting each row's primary key id before import.",
   );
   await prisma.$executeRaw(RESET_IMPORT_TABLES_SQL);
   console.log("Import tables cleared.");

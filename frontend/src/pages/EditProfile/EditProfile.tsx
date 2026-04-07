@@ -15,9 +15,9 @@ export const EditProfile = () => {
   const [username, setUsername] = useState(user?.username || "");
   const [email, setEmail] = useState(user?.email || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [usernameError, setUsernameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [formError, setFormError] = useState("");
+  const [usernameError, setUsernameError] = useState<string | undefined>(undefined);
+  const [emailError, setEmailError] = useState<string | undefined>(undefined);
+  const [formError, setFormError] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
 
   const parsed = editProfileSchema.safeParse({ username, email });
@@ -25,15 +25,15 @@ export const EditProfile = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setUsernameError("");
-    setEmailError("");
-    setFormError("");
+    setUsernameError(undefined);
+    setEmailError(undefined);
+    setFormError(undefined);
 
     if (!parsed.success) {
       const flat = parsed.error.flatten();
-      setUsernameError(flat.fieldErrors.username?.[0] ?? "");
-      setEmailError(flat.fieldErrors.email?.[0] ?? "");
-      setFormError(flat.formErrors[0] ?? "");
+      setUsernameError(flat.fieldErrors.username?.[0]);
+      setEmailError(flat.fieldErrors.email?.[0]);
+      setFormError(flat.formErrors[0]);
       return;
     }
 

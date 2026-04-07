@@ -17,11 +17,14 @@ const querySchema = z.object({
 router.get("/", async (req, res) => {
   const parseResult = querySchema.safeParse(req.query);
   if (!parseResult.success) {
-    return res.status(400).json({ error: parseResult.error.flatten() });
+    const flattenedError = z.flattenError(parseResult.error);
+    return res.status(400).json({
+      formErrors: flattenedError.formErrors,
+      fieldErrors: flattenedError.fieldErrors,
+    });
   }
   const { numOfWords, language } = parseResult.data;
   try {
-    // Look up language in Language table
     const lang: Language | null = await prisma.language.findUnique({
       where: { value: language },
     });
