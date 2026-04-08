@@ -1,13 +1,19 @@
-export interface Word {
+export interface WordSuccessResponse {
   id: number;
   value: string;
   languageId: number;
   frequencyRank: number | null;
+  partOfSpeech: string | null;
+  translation: string | null;
+  exampleBase: string | null;
+  exampleTarget: string | null;
 }
 
-export const getWords = async (numOfWords: string): Promise<Word[]> => {
+export const getWords = async (
+  numOfWords?: string,
+): Promise<WordSuccessResponse[]> => {
   const params = new URLSearchParams({
-    numOfWords: numOfWords,
+    ...(numOfWords ? { numOfWords } : {}),
     language: "de",
   });
   const response = await fetch(`/api/words?${params.toString()}`);

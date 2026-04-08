@@ -3,7 +3,6 @@ import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { createApp } from "../../app.js";
 import { prisma } from "../../../prisma/prisma.js";
-import type { Word } from "@prisma/client";
 import { getJson } from "../../utils/testUtils.js";
 
 vi.mock("../../../prisma/prisma", () => ({
@@ -48,13 +47,12 @@ afterEach(async () => {
 });
 
 describe("words routes", () => {
-  it("returns 400 with validation errors if query params are missing", async () => {
+  it("returns 400 with validation errors if the required query param is missing", async () => {
     const res = await getJson(baseUrl, "/api/words");
     expect(res.status).toBe(400);
     const body = await res.json();
     expect(body).toHaveProperty("formErrors");
     expect(body).toHaveProperty("fieldErrors");
-    expect(body.fieldErrors).toHaveProperty("numOfWords");
     expect(body.fieldErrors).toHaveProperty("language");
   });
 
@@ -71,15 +69,55 @@ describe("words routes", () => {
       id: 1,
       value: "en",
     });
-    const mockWords: Word[] = [
-      { id: 1, value: "Haus", languageId: 1, frequencyRank: 1 },
-      { id: 2, value: "Baum", languageId: 1, frequencyRank: 2 },
+    const mockWords = [
+      {
+        id: 1,
+        value: "Haus",
+        languageId: 1,
+        frequencyRank: 1,
+        meanings: [
+          {
+            exampleBase: "house",
+            exampleTarget: "Haus",
+            partOfSpeech: { value: "noun" },
+            translations: [{ toWord: { value: "house" } }],
+          },
+        ],
+      },
+      {
+        id: 2,
+        value: "Baum",
+        languageId: 1,
+        frequencyRank: 2,
+        meanings: [],
+      },
     ];
     prismaMock.word.findMany.mockResolvedValueOnce(mockWords);
     const res = await getJson(baseUrl, "/api/words?numOfWords=2&language=en");
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body).toEqual(mockWords);
+    expect(body).toEqual([
+      {
+        id: 1,
+        value: "Haus",
+        languageId: 1,
+        frequencyRank: 1,
+        partOfSpeech: "noun",
+        translation: "house",
+        exampleBase: "house",
+        exampleTarget: "Haus",
+      },
+      {
+        id: 2,
+        value: "Baum",
+        languageId: 1,
+        frequencyRank: 2,
+        partOfSpeech: null,
+        translation: null,
+        exampleBase: null,
+        exampleTarget: null,
+      },
+    ]);
   });
 
   it("returns 500 on internal error", async () => {

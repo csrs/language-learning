@@ -1,15 +1,12 @@
 import { Router } from "express";
 import { prisma } from "../../prisma/prisma.js";
 import { z } from "zod";
-import type { Language, Word } from "@prisma/client";
+import type { Language } from "@prisma/client";
 
 export const router = Router();
 
 const querySchema = z.object({
-  numOfWords: z
-    .string()
-    .min(1)
-    .max(2, { error: "Must be at most 99 characters" }),
+  numOfWords: z.string().optional(),
   language: z.string().min(2).max(2, { error: "Must be exactly 2 characters" }),
 });
 
@@ -33,12 +30,60 @@ router.get("/", async (req, res) => {
         .status(400)
         .json({ error: `Language '${language}' not found in database` });
     }
-    const words: Word[] = await prisma.word.findMany({
+
+    const words = await prisma.word.findMany({
       where: { languageId: lang.id },
-      take: Number(numOfWords),
+      ...(numOfWords ? { take: Number(numOfWords) } : {}),
       orderBy: { id: "asc" },
+      select: {
+        id: true,
+        value: true,
+        languageId: true,
+        frequencyRank: true,
+        meanings: {
+          orderBy: { id: "asc" },
+          take: 1,
+          select: {
+            exampleBase: true,
+            exampleTarget: true,
+            partOfSpeech: {
+              select: {
+                value: true,
+              },
+            },
+            translations: {
+              orderBy: { id: "asc" },
+              take: 1,
+              select: {
+                toWord: {
+                  select: {
+                    value: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
-    res.json(words);
+
+    const response = words.map((word) => {
+      const firstMeaning = word.meanings[0];
+      const firstTranslation = firstMeaning?.translations[0];
+
+      return {
+        id: word.id,
+        value: word.value,
+        languageId: word.languageId,
+        frequencyRank: word.frequencyRank,
+        partOfSpeech: firstMeaning?.partOfSpeech.value ?? null,
+        translation: firstTranslation?.toWord.value ?? null,
+        exampleBase: firstMeaning?.exampleBase ?? null,
+        exampleTarget: firstMeaning?.exampleTarget ?? null,
+      };
+    });
+
+    res.json(response);
   } catch {
     res.status(500).json({ error: "Internal server error" });
   }
