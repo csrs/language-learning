@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -12,12 +12,12 @@ import { useAuth } from "../../context/AuthContext";
 
 export const EditProfile = () => {
   const { user } = useAuth();
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(user?.username || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [usernameError, setUsernameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [formError, setFormError] = useState("");
+  const [usernameError, setUsernameError] = useState<string | undefined>(undefined);
+  const [emailError, setEmailError] = useState<string | undefined>(undefined);
+  const [formError, setFormError] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
 
   const parsed = editProfileSchema.safeParse({ username, email });
@@ -25,15 +25,15 @@ export const EditProfile = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setUsernameError("");
-    setEmailError("");
-    setFormError("");
+    setUsernameError(undefined);
+    setEmailError(undefined);
+    setFormError(undefined);
 
     if (!parsed.success) {
       const flat = parsed.error.flatten();
-      setUsernameError(flat.fieldErrors.username?.[0] ?? "");
-      setEmailError(flat.fieldErrors.email?.[0] ?? "");
-      setFormError(flat.formErrors[0] ?? "");
+      setUsernameError(flat.fieldErrors.username?.[0]);
+      setEmailError(flat.fieldErrors.email?.[0]);
+      setFormError(flat.formErrors[0]);
       return;
     }
 
@@ -42,11 +42,21 @@ export const EditProfile = () => {
       await editProfile(username.trim(), email.trim());
       navigate("/");
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Update failed");
+      setFormError(err instanceof Error ? err.message : "Edit profile failed");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    // This is inside a useEffect because user comes from the 'GET me' endpoint called in AuthContext, and that endpoint is async.
+    // We need to wait to get a result from the endpoint, but the username and email states in this component won't update after
+    // the user is initialized. So we ned to have them update inside a useEffect.
+    if (user) {
+      setUsername(user.username || "");
+      setEmail(user.email || "");
+    }
+  }, [user]);
 
   return (
     <Box sx={{ maxWidth: 400, mx: "auto", mt: 4 }}>
@@ -66,7 +76,6 @@ export const EditProfile = () => {
           )}
           <TextField
             type="text"
-            placeholder={user?.username}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             disabled={isSubmitting}
@@ -80,7 +89,6 @@ export const EditProfile = () => {
           />
           <TextField
             type="email"
-            placeholder={user?.email}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}

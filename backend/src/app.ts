@@ -8,6 +8,7 @@ import cors from "cors";
 
 import { router as authRouter } from "./routes/auth.js";
 import { router as meRouter } from "./routes/me.js";
+import { router as wordsRouter } from "./routes/words.js";
 
 export const createApp = () => {
   const app = express();
@@ -37,6 +38,7 @@ export const createApp = () => {
   app.use(express.urlencoded({ extended: false }));
 
   app.use("/api/me", meRouter);
+  app.use("/api/words", wordsRouter);
   app.use("/api/auth", authRouter);
 
   app.use((req, res) => {

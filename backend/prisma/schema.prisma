@@ -8,19 +8,68 @@ datasource db {
 }
 
 model User {
-  id            Int    @id @default(autoincrement())
-  username      String @unique
-  email         String @unique
-  password_hash String
-  sessions      Session[]
+  id             Int    @id @default(autoincrement())
+  username       String @unique
+  email          String @unique
+  passwordHash   String
+  sessions       Session[]
 }
 
 model Session {
-  id        String   @id
-  userId    Int
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               Int      @id @default(autoincrement())
+  sessionId        String   @unique
+  userId           Int
+  expiresAt        DateTime
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+model Word {
+  id                Int             @id @default(autoincrement())
+  value             String
+  languageId        Int
+  language          Language        @relation(fields: [languageId], references: [id])
+  meanings          ExampleSentence[]
+  translationsTo    Translation[]   @relation("translationTo")
+  frequencyRank     Int?
+
+  @@unique([value, languageId])
+}
+
+model ExampleSentence {
+  id              Int          @id @default(autoincrement())
+  wordId          Int
+  word            Word         @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  partOfSpeechId  Int
+  partOfSpeech    PartOfSpeech @relation(fields: [partOfSpeechId], references: [id])
+  exampleTarget   String
+  exampleBase     String
+  translations    Translation[]
+
+  @@index([wordId])
+  @@index([partOfSpeechId])
+}
+
+model Translation {
+  id                  Int             @id @default(autoincrement())
+  exampleSentenceId   Int
+  exampleSentence     ExampleSentence @relation(fields: [exampleSentenceId], references: [id])
+  toWordId            Int
+  toWord              Word            @relation("translationTo", fields: [toWordId], references: [id])
+
+  @@unique([exampleSentenceId, toWordId])
+}
+
+model PartOfSpeech {
+  id        Int       @id @default(autoincrement())
+  value     String    @unique
+  meanings  ExampleSentence[]
+}
+
+model Language {
+  id        Int       @id @default(autoincrement())
+  value     String    @unique @db.VarChar(2)
+  words     Word[]
 }

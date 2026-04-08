@@ -24,7 +24,7 @@ export const createSession = async (
   const storedSessionId = getHmacHashedString(rawSessionId);
   await prisma.session.create({
     data: {
-      id: storedSessionId,
+      sessionId: storedSessionId,
       userId,
       expiresAt: getSessionExpiryDate(now),
     },
@@ -43,7 +43,7 @@ export const getUserIdFromSession = async (
 
   const storedSessionId = getHmacHashedString(rawSessionId);
   const session = await prisma.session.findUnique({
-    where: { id: storedSessionId },
+    where: { sessionId: storedSessionId },
     select: {
       userId: true,
       expiresAt: true,
@@ -64,7 +64,7 @@ export const getUserIdFromSession = async (
 
 const deleteStoredSession = async (storedSessionId: string): Promise<void> => {
   await prisma.session.deleteMany({
-    where: { id: storedSessionId },
+    where: { sessionId: storedSessionId },
   });
 };
 

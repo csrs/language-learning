@@ -154,7 +154,7 @@ router.patch("/password", async (req, res) => {
 
   const user = await prisma.user.update({
     where: { id: userId },
-    data: { password_hash: await createPasswordHash(parsedBody.data.password) },
+    data: { passwordHash: await createPasswordHash(parsedBody.data.password) },
     select: {
       id: true,
       username: true,

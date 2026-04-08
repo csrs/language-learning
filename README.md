@@ -24,10 +24,28 @@ Locally:
 1. `cd backend`
 2. `docker compose exec backend sh`
 3. `npx prisma migrate dev --name name_of_migration`
-4. The generated `PrismaClient` will be automatically re-generated (see https://www.prisma.io/docs/orm/prisma-migrate/workflows/development-and-production#create-and-apply-migrations)
+4. `npx prisma generate`
 
 In Supabase:
 
 1. `cd backend`
 2. `docker compose exec backend sh`
-3. `DATABASE_URL=<DIRECT_URL_FOR_SUPABASE from backend/.env> npx prisma migrate deploy`
+3. `DATABASE_URL="<DIRECT_URL_FOR_SUPABASE from backend/.env>" npx prisma migrate deploy`
+
+### How to remove all data from local database
+
+1. `cd backend`
+2. `docker compose exec backend sh`
+3. `echo 'TRUNCATE "Translation", "ExampleSentence", "Word", "PartOfSpeech", "Language", "Session", "User" RESTART IDENTITY CASCADE;' | npx prisma db execute --stdin`
+
+### Rollback a failed migration in Supabase
+
+1. `DATABASE_URL="<DIRECT_URL_FOR_SUPABASE from backend/.env>" npx prisma migrate resolve --rolled-back "<name-of-migration"` https://www.prisma.io/docs/orm/prisma-migrate/workflows/patching-and-hotfixing#failed-migration
+2. `DATABASE_URL="<DIRECT_URL_FOR_SUPABASE from backend/.env>" npx prisma migrate deploy`
+
+### Apply data to Supabase database
+
+1. `cd backend`
+2. Change `DATABASE_URL` in `backend/.env` to the Supabase Direct connection string
+3. Run `npx tsx <path-to-seeding-script>` to append only new import data
+4. Run `npx tsx <path-to-seeding-script> --clear-first` to delete existing import tables first and then reseed them
