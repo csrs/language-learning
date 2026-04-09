@@ -6,17 +6,15 @@ export const About = () => {
   return (
     <Box>
       <Typography variant="h6" align="left" mb={2}>
-        German words in order of frequency usage
+        German-English Learning Tool
       </Typography>
       <Typography variant="body2" align="left" mb={3}>
-        German words are the top n words in the language, by frequency usage
-        based off of written usage. [
         <Link
           href="https://www.amazon.com/Frequency-Dictionary-German-Vocabulary-Dictionaries/dp/1138659789"
           target="_blank"
           rel="noreferrer"
         >
-          Source
+          Source for the word data
         </Link>
       </Typography>
     </Box>

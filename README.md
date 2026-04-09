@@ -3,6 +3,10 @@
 1. `cd frontend`
 2. `npm run dev`
 
+### API docs
+
+- Swagger Docs are available at (locally) `http://localhost:3000/api/docs` and the `<RENDER_URL>/api/docs`
+
 ### How to connect to the DB in Docker
 
 1. `cd backend`

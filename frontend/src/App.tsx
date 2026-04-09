@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { AuthProvider } from "./context/AuthContext";
 import { Layout } from "./components/Layout/Layout";
-import { Home } from "./components/Home/Home";
+import { Home } from "./pages/Home/Home";
 import { Register } from "./pages/Register/Register";
 import { Login } from "./pages/Login/Login";
 import { EditProfile } from "./pages/EditProfile/EditProfile";
