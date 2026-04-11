@@ -1,3 +1,7 @@
+### Swagger Docs
+
+https://language-learning-krm7.onrender.com/api/doc
+
 ### How to run the frontend
 
 1. `cd frontend`
@@ -11,7 +15,7 @@
 
 1. `cd backend`
 2. `docker compose up db backend`
-3. Go to the DB tab in VSCode and connect with these credentials:
+3. Go to the PostgreSQL Extension DB tab in VSCode and connect with these credentials:
 
 - Port: 5435
 - Host: localhost

@@ -75,10 +75,8 @@ router.post("/register", async (req, res) => {
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      const target = (error.meta?.target as string[]) ?? [];
-      const field = target.includes("email") ? "email" : "username";
       return res.status(409).json({
-        error: `A user with that ${field} already exists`,
+        error: `Username or email already exists`,
       });
     }
 

@@ -390,7 +390,7 @@ export const createOpenApiDocument = () => {
               content: jsonContent(schemaRef("ErrorResponse")),
             },
             "500": {
-              description: "Unexpected server error",
+              description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
@@ -406,15 +406,19 @@ export const createOpenApiDocument = () => {
           },
           responses: {
             "200": {
-              description: "Login successful",
+              description: "Authenticated user returned and session cookie set",
               content: jsonContent(schemaRef("User")),
             },
             "400": {
-              description: "Missing or invalid credentials",
+              description: "Username and/or password are incorrect.",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
             "401": {
-              description: "Username or password is incorrect",
+              description: "Username and/or password are incorrect.",
+              content: jsonContent(schemaRef("ErrorResponse")),
+            },
+            "500": {
+              description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
@@ -423,11 +427,16 @@ export const createOpenApiDocument = () => {
       "/api/auth/logout": {
         post: {
           tags: ["Auth"],
-          summary: "Log out and clear the session cookie",
+          summary:
+            "Log out the current authenticated user and delete the session cookie",
           security: [{ sessionCookie: [] }],
           responses: {
             "204": {
-              description: "Logged out successfully",
+              description: "Logged out successfully and deleted session cookie",
+            },
+            "500": {
+              description: "Internal server error",
+              content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
         },
@@ -443,7 +452,11 @@ export const createOpenApiDocument = () => {
               content: jsonContent(schemaRef("User")),
             },
             "401": {
-              description: "No valid session",
+              description: "Not authenticated",
+              content: jsonContent(schemaRef("ErrorResponse")),
+            },
+            "500": {
+              description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
@@ -470,7 +483,7 @@ export const createOpenApiDocument = () => {
               content: jsonContent(schemaRef("ErrorResponse")),
             },
             "500": {
-              description: "Unexpected server error",
+              description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
@@ -485,6 +498,10 @@ export const createOpenApiDocument = () => {
             },
             "401": {
               description: "No valid session",
+              content: jsonContent(schemaRef("ErrorResponse")),
+            },
+            "500": {
+              description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
@@ -510,6 +527,10 @@ export const createOpenApiDocument = () => {
             },
             "401": {
               description: "No valid session",
+              content: jsonContent(schemaRef("ErrorResponse")),
+            },
+            "500": {
+              description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
@@ -555,7 +576,7 @@ export const createOpenApiDocument = () => {
               }),
             },
             "500": {
-              description: "Unexpected server error",
+              description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
@@ -571,7 +592,8 @@ export const createOpenApiDocument = () => {
               name: "value",
               in: "path",
               required: true,
-              description: "Full or partial word value to look up",
+              description:
+                "Full word (including or not including the article) to look up (e.g. 'werden', 'wird', 'Haus', 'haus', 'der', 'Frau', 'house')",
               schema: {
                 type: "string",
                 minLength: 1,
@@ -582,8 +604,7 @@ export const createOpenApiDocument = () => {
               name: "language",
               in: "query",
               required: true,
-              description:
-                "Language of the search term. Use 'de' for German headwords or 'en' for English reverse lookup.",
+              description: "Language of the search term.",
               schema: {
                 type: "string",
                 enum: ["de", "en"],
@@ -594,7 +615,7 @@ export const createOpenApiDocument = () => {
           responses: {
             "200": {
               description:
-                "German word detail matches with linked meanings and translations",
+                "Word(s) found with translation(s), part(s) of speech, and example sentence(s)",
               content: jsonContent(schemaRef("WordDetailList")),
             },
             "400": {
@@ -608,11 +629,11 @@ export const createOpenApiDocument = () => {
               }),
             },
             "404": {
-              description: "No German matches found for the requested lookup",
+              description: "No matches found for the requested lookup",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
             "500": {
-              description: "Unexpected server error",
+              description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
           },
