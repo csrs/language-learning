@@ -34,6 +34,7 @@ const prismaMock = vi.mocked(prisma, { deep: true });
 let server: Server;
 let baseUrl: string;
 let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+let previousRenderExternalUrl: string | undefined;
 
 beforeEach(async () => {
   vi.resetAllMocks();
@@ -43,6 +44,9 @@ beforeEach(async () => {
   prismaMock.user.update.mockResolvedValue({} as never);
   prismaMock.user.deleteMany.mockResolvedValue({ count: 0 } as never);
   consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+  previousRenderExternalUrl = process.env.RENDER_EXTERNAL_URL;
+  process.env.RENDER_EXTERNAL_URL =
+    "https://language-learning-krm7.onrender.com";
 
   server = createApp().listen(0, "127.0.0.1");
   await new Promise<void>((resolve) => {
@@ -71,9 +75,60 @@ afterEach(async () => {
   });
 
   consoleErrorSpy.mockRestore();
+
+  if (previousRenderExternalUrl === undefined) {
+    delete process.env.RENDER_EXTERNAL_URL;
+  } else {
+    process.env.RENDER_EXTERNAL_URL = previousRenderExternalUrl;
+  }
 });
 
 describe("POST /api/auth/register", () => {
+  it("allows the origin to be the configured Render origin", async () => {
+    const response = await postJson(
+      baseUrl,
+      "/api/auth/register",
+      {
+        username: "Ada",
+        email: "ada@example.com",
+        password: "test-password",
+      },
+      {
+        headers: {
+          Origin: "https://language-learning-krm7.onrender.com",
+        },
+      },
+    );
+
+    expect(response.status).toBe(201);
+
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+  });
+
+  it("returns 403 for an unapproved origin", async () => {
+    const response = await postJson(
+      baseUrl,
+      "/api/auth/register",
+      {
+        username: "Ada",
+        email: "ada@example.com",
+        password: "super-secret",
+      },
+      {
+        headers: {
+          Origin: "https://example.com",
+        },
+      },
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({
+      error: "Not allowed by CORS",
+    });
+    expect(prismaMock.user.create).not.toHaveBeenCalled();
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+  });
+
   it("creates a user with a normalized email and hashed password", async () => {
     prismaMock.user.create.mockResolvedValueOnce({
       id: 1,

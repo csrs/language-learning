@@ -126,9 +126,6 @@ export const GetDetailsByWordForm = () => {
         <Box
           sx={{
             mt: 4,
-            mx: "auto",
-            px: { xs: 2, sm: 3 },
-            width: "100%",
             maxWidth: 960,
           }}
         >
