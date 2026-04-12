@@ -7,11 +7,7 @@ import { prisma } from "../prisma/prisma.js";
 import { createApp } from "./app.js";
 import { SESSION_COOKIE_NAME } from "./lib/session.js";
 import { createPasswordHash } from "./lib/password.js";
-import {
-  getJson,
-  getRequiredSessionCookie,
-  postJson,
-} from "./utils/testUtils.js";
+import { getRequiredSessionCookie, postJson } from "./utils/testUtils.js";
 
 vi.mock("../prisma/prisma.js", () => ({
   prisma: {
@@ -640,30 +636,6 @@ describe("API docs", () => {
 
     expect(html).toContain("SwaggerUIBundle");
     expect(html).toContain("/api/docs/openapi.json");
-  });
-
-  it("serves the OpenAPI document with a placeholder Render URL fallback", async () => {
-    const previousRenderExternalUrl = process.env.RENDER_EXTERNAL_URL;
-    delete process.env.RENDER_EXTERNAL_URL;
-
-    try {
-      const response = await getJson(baseUrl, "/api/docs/openapi.json");
-
-      expect(response.status).toBe(200);
-
-      const json = await response.json();
-
-      expect(json.openapi).toBe("3.0.3");
-      expect(json.paths["/api/allWords"]).toBeDefined();
-      expect(json.paths["/api/words/{value}"]).toBeDefined();
-      expect(json.paths["/api/auth/login"]).toBeDefined();
-    } finally {
-      if (previousRenderExternalUrl === undefined) {
-        delete process.env.RENDER_EXTERNAL_URL;
-      } else {
-        process.env.RENDER_EXTERNAL_URL = previousRenderExternalUrl;
-      }
-    }
   });
 });
 

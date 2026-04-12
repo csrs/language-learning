@@ -53,7 +53,7 @@ export const getAllWords = async (): Promise<WordSuccessResponse[]> => {
   const params = new URLSearchParams({
     language: "de",
   });
-  const response = await fetch(`/api/allWords?${params.toString()}`);
+  const response = await fetch(`/api/words/all?${params.toString()}`);
   if (!response.ok) {
     const body: { error?: string } | null = await response
       .json()
@@ -63,16 +63,17 @@ export const getAllWords = async (): Promise<WordSuccessResponse[]> => {
   return response.json();
 };
 
-export const getWordByValue = async (
+export const getDetailsByValue = async (
   word: string,
   language: WordLookupLanguage = "de",
 ): Promise<WordDetailsResponse[]> => {
   const params = new URLSearchParams({
+    word,
     language,
   });
   const encodedWord = encodeURIComponent(word);
   const response = await fetch(
-    `/api/words/${encodedWord}?${params.toString()}`,
+    `/api/words?word=${encodedWord}&${params.toString()}`,
   );
   if (!response.ok) {
     const body: { error?: string } | null = await response

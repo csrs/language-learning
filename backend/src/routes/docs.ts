@@ -536,7 +536,7 @@ export const createOpenApiDocument = () => {
           },
         },
       },
-      "/api/allWords": {
+      "/api/words/all": {
         get: {
           tags: ["Words"],
           summary:
@@ -553,10 +553,6 @@ export const createOpenApiDocument = () => {
                 },
               },
             },
-            "400": {
-              description: "Language not found in database",
-              content: jsonContent(schemaRef("ErrorResponse")),
-            },
             "500": {
               description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),
@@ -564,15 +560,15 @@ export const createOpenApiDocument = () => {
           },
         },
       },
-      "/api/words/{value}": {
+      "/api/words": {
         get: {
           tags: ["Words"],
           summary:
             "Get translation word matches and details from a German or English input word",
           parameters: [
             {
-              name: "value",
-              in: "path",
+              name: "word",
+              in: "query",
               required: true,
               description:
                 "Full word (including or not including the article) to look up (e.g. 'werden', 'wird', 'Haus', 'haus', 'der', 'Frau', 'house')",

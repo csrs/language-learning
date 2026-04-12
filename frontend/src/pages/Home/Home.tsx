@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { GetDetailsByWordForm } from "../../components/GetDetailsByWordForm/GetDetailsByWordForm";
+import { GetDetailsByWordForm } from "../../components/GetDetailsByValueForm/GetDetailsByValueForm";
 
 export const Home = () => {
   return (

@@ -45,8 +45,8 @@ interface WordDetailsResponse {
   meanings: WordDetailsMeaningResponse[];
 }
 
-const getWordByValueRequestSchema = z.object({
-  value: z.string().trim().min(1, { error: "Must be at least one character" }),
+const getDetailsByValueRequestSchema = z.object({
+  word: z.string().trim().min(1, { error: "Must be at least one character" }),
   language: z.enum(["de", "en"]),
 });
 
@@ -336,11 +336,52 @@ const mapEnglishMatchesToGermanWordDetails = (
   return sortWordDetailMatches(Array.from(germanWordsById.values()));
 };
 
-// GET /api/words/:value?language=de|en
+// GET /api/words/all
+router.get("/all", async (_req, res) => {
+  void _req;
+  try {
+    const lang: Language | null = await prisma.language.findUnique({
+      where: { value: "de" },
+    });
+    if (!lang) {
+      return res
+        .status(500)
+        .json({ error: `Language 'de' not found in database` });
+    }
+
+    const words = await prisma.word.findMany({
+      where: { languageId: lang.id },
+      orderBy: { frequencyRank: "asc" },
+      select: wordListSelect,
+    });
+
+    const response = words.map((word) => {
+      const firstMeaning = word.meanings[0];
+      const firstTranslation = firstMeaning?.translations[0];
+
+      return {
+        id: word.id,
+        value: word.value,
+        languageId: word.languageId,
+        frequencyRank: word.frequencyRank,
+        partOfSpeech: firstMeaning?.partOfSpeech.value ?? null,
+        translation: firstTranslation?.toWord.value ?? null,
+        exampleBase: firstMeaning?.exampleBase ?? null,
+        exampleTarget: firstMeaning?.exampleTarget ?? null,
+      };
+    });
+
+    return res.json(response);
+  } catch {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/words?word={word}&language=de|en
 // return German word detail matches for either direct German search or reverse English lookup
-router.get("/:value", async (req, res) => {
-  const parseResult = getWordByValueRequestSchema.safeParse({
-    value: req.params.value,
+router.get("/", async (req, res) => {
+  const parseResult = getDetailsByValueRequestSchema.safeParse({
+    word: req.query.word,
     language: req.query.language,
   });
   if (!parseResult.success) {
@@ -351,8 +392,8 @@ router.get("/:value", async (req, res) => {
     });
   }
 
-  const { value, language } = parseResult.data;
-  const searchValue = value.trim();
+  const { word, language } = parseResult.data;
+  const searchValue = word.trim();
 
   try {
     const searchLanguage = await getLanguageByValue(language);
@@ -400,47 +441,6 @@ router.get("/:value", async (req, res) => {
     }
 
     return res.json(germanMatches);
-  } catch {
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// GET /api/allWords
-router.get("/", async (_req, res) => {
-  void _req;
-  try {
-    const lang: Language | null = await prisma.language.findUnique({
-      where: { value: "de" },
-    });
-    if (!lang) {
-      return res
-        .status(400)
-        .json({ error: `Language 'de' not found in database` });
-    }
-
-    const words = await prisma.word.findMany({
-      where: { languageId: lang.id },
-      orderBy: { frequencyRank: "asc" },
-      select: wordListSelect,
-    });
-
-    const response = words.map((word) => {
-      const firstMeaning = word.meanings[0];
-      const firstTranslation = firstMeaning?.translations[0];
-
-      return {
-        id: word.id,
-        value: word.value,
-        languageId: word.languageId,
-        frequencyRank: word.frequencyRank,
-        partOfSpeech: firstMeaning?.partOfSpeech.value ?? null,
-        translation: firstTranslation?.toWord.value ?? null,
-        exampleBase: firstMeaning?.exampleBase ?? null,
-        exampleTarget: firstMeaning?.exampleTarget ?? null,
-      };
-    });
-
-    return res.json(response);
   } catch {
     return res.status(500).json({ error: "Internal server error" });
   }

@@ -45,7 +45,7 @@ export const createApp = () => {
 
   app.use("/api/docs", docsRouter);
   app.use("/api/me", meRouter);
-  app.use("/api/allWords", wordsRouter);
+  app.use("/api/words", wordsRouter);
   app.use("/api/auth", authRouter);
 
   // If any other URL is requested, return a 404 error because the only routes in this application are the ones listed

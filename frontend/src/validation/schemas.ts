@@ -56,7 +56,7 @@ export const changePasswordSchema = z
   })
   .strict();
 
-export const getWordByValueRequestSchema = z.object({
+export const getDetailsByValueRequestSchema = z.object({
   value: z.string().trim().min(1, { error: "Must be at least one character" }),
   language: z.enum(["de", "en"]),
 });

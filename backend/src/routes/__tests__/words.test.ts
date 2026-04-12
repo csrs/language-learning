@@ -208,7 +208,9 @@ describe("words routes", () => {
       },
     ];
 
-    const originalMeaningIds = matches[0]?.meanings.map((meaning) => meaning.id);
+    const originalMeaningIds = matches[0]?.meanings.map(
+      (meaning) => meaning.id,
+    );
     const originalTranslationIds = matches[0]?.meanings[0]?.translations.map(
       (translation) => translation.id,
     );
@@ -219,7 +221,9 @@ describe("words routes", () => {
     expect(originalTranslationIds).toEqual([6, 4]);
     expect(matches[0]?.meanings.map((meaning) => meaning.id)).toEqual([9, 3]);
     expect(
-      matches[0]?.meanings[0]?.translations.map((translation) => translation.id),
+      matches[0]?.meanings[0]?.translations.map(
+        (translation) => translation.id,
+      ),
     ).toEqual([6, 4]);
     expect(result[0]?.meanings.map((meaning) => meaning.id)).toEqual([3, 9]);
     expect(
@@ -256,7 +260,7 @@ describe("words routes", () => {
       },
     ] as never);
 
-    const res = await getJson(baseUrl, "/api/words?numOfWords=2&language=en");
+    const res = await getJson(baseUrl, "/api/words/all?language=en");
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual([
@@ -285,14 +289,14 @@ describe("words routes", () => {
 
   it("returns 500 on internal error", async () => {
     prismaMock.language.findUnique.mockRejectedValueOnce(new Error("fail"));
-    const res = await getJson(baseUrl, "/api/words?numOfWords=2&language=en");
+    const res = await getJson(baseUrl, "/api/words/all?language=en");
     expect(res.status).toBe(500);
     const body = await res.json();
     expect(body).toHaveProperty("error");
   });
 
   it("returns 400 for single-word lookup when language is missing", async () => {
-    const res = await getJson(baseUrl, "/api/words/Haus");
+    const res = await getJson(baseUrl, "/api/words?word=Haus");
 
     expect(res.status).toBe(400);
 
@@ -304,7 +308,7 @@ describe("words routes", () => {
   });
 
   it("returns 400 for single-word lookup when the lookup language is unsupported", async () => {
-    const res = await getJson(baseUrl, "/api/words/Haus?language=fr");
+    const res = await getJson(baseUrl, "/api/words?word=Haus&language=fr");
 
     expect(res.status).toBe(400);
 
@@ -318,7 +322,7 @@ describe("words routes", () => {
   it("returns 400 for single-word lookup if the configured lookup language is missing", async () => {
     prismaMock.language.findUnique.mockResolvedValueOnce(null);
 
-    const res = await getJson(baseUrl, "/api/words/Haus?language=de");
+    const res = await getJson(baseUrl, "/api/words?word=Haus&language=de");
 
     expect(res.status).toBe(400);
     await expect(res.json()).resolves.toEqual({
@@ -336,7 +340,7 @@ describe("words routes", () => {
       .mockResolvedValueOnce([] as never)
       .mockResolvedValueOnce([] as never);
 
-    const res = await getJson(baseUrl, "/api/words/Haus?language=de");
+    const res = await getJson(baseUrl, "/api/words?word=Haus&language=de");
 
     expect(res.status).toBe(404);
     await expect(res.json()).resolves.toEqual({
@@ -386,7 +390,10 @@ describe("words routes", () => {
       },
     ] as never);
 
-    const res = await getJson(baseUrl, "/api/words/Haus?language=de&word=Baum");
+    const res = await getJson(
+      baseUrl,
+      "/api/words?word=Haus&language=de",
+    );
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual([
@@ -458,7 +465,7 @@ describe("words routes", () => {
         },
       ] as never);
 
-    const res = await getJson(baseUrl, "/api/words/werden?language=de");
+    const res = await getJson(baseUrl, "/api/words?word=werden&language=de");
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual([
@@ -539,7 +546,7 @@ describe("words routes", () => {
         },
       ] as never);
 
-    const res = await getJson(baseUrl, "/api/words/haus?language=de");
+    const res = await getJson(baseUrl, "/api/words?word=haus&language=de");
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual([
@@ -643,7 +650,10 @@ describe("words routes", () => {
       },
     ] as never);
 
-    const res = await getJson(baseUrl, "/api/words/to%20run?language=en");
+    const res = await getJson(
+      baseUrl,
+      "/api/words?word=to+run&language=en",
+    );
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual([
@@ -789,7 +799,7 @@ describe("words routes", () => {
         },
       ] as never);
 
-    const res = await getJson(baseUrl, "/api/words/run?language=en");
+    const res = await getJson(baseUrl, "/api/words?word=run&language=en");
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual([

@@ -3,10 +3,13 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { getWordByValueRequestSchema } from "../../validation/schemas";
+import { getDetailsByValueRequestSchema } from "../../validation/schemas";
 import z from "zod";
-import { SharedFormPaper } from "../../components/SharedFormPaper/SharedFormPaper";
-import { getWordByValue, type WordDetailsResponse } from "../../api/getWords";
+import { SharedFormPaper } from "../SharedFormPaper/SharedFormPaper";
+import {
+  getDetailsByValue,
+  type WordDetailsResponse,
+} from "../../api/getWords";
 import {
   Card,
   CardContent,
@@ -27,7 +30,7 @@ export const GetDetailsByWordForm = () => {
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const parsedInput = getWordByValueRequestSchema.safeParse({
+  const parsedInput = getDetailsByValueRequestSchema.safeParse({
     value,
     language,
   });
@@ -52,7 +55,7 @@ export const GetDetailsByWordForm = () => {
     setIsSubmitting(true);
     setResults(null);
     try {
-      const res = await getWordByValue(value.trim(), language);
+      const res = await getDetailsByValue(value.trim(), language);
       setResults(res);
     } catch (err) {
       setResults(null);

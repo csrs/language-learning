@@ -1,6 +1,6 @@
 import { afterEach } from "vitest";
 import type { WordDetailsResponse } from "../getWords";
-import { getAllWords, getWordByValue } from "../getWords";
+import { getAllWords, getDetailsByValue } from "../getWords";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -17,7 +17,7 @@ describe("getAllWords", () => {
 
     const result = await getAllWords();
 
-    expect(fetchSpy).toHaveBeenCalledWith("/api/allWords?language=de");
+    expect(fetchSpy).toHaveBeenCalledWith("/api/words/all?language=de");
     expect(result).toEqual(mockWords);
   });
 
@@ -30,7 +30,7 @@ describe("getAllWords", () => {
   });
 });
 
-describe("getWordByValue", () => {
+describe("getDetailsByValue", () => {
   it("calls fetch with the word in the path", async () => {
     const mockWord: WordDetailsResponse[] = [
       {
@@ -50,9 +50,11 @@ describe("getWordByValue", () => {
         new Response(JSON.stringify(mockWord), { status: 200 }),
       );
 
-    const result = await getWordByValue("Haus");
+    const result = await getDetailsByValue("Haus");
 
-    expect(fetchSpy).toHaveBeenCalledWith("/api/words/Haus?language=de");
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "/api/words?word=Haus&word=Haus&language=de",
+    );
     expect(result).toEqual(mockWord);
   });
 
@@ -75,9 +77,11 @@ describe("getWordByValue", () => {
         new Response(JSON.stringify(mockWord), { status: 200 }),
       );
 
-    const result = await getWordByValue("to run", "en");
+    const result = await getDetailsByValue("to run", "en");
 
-    expect(fetchSpy).toHaveBeenCalledWith("/api/words/to%20run?language=en");
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "/api/words?word=to%20run&word=to+run&language=en",
+    );
     expect(result).toEqual(mockWord);
   });
 
@@ -88,7 +92,7 @@ describe("getWordByValue", () => {
       }),
     );
 
-    await expect(getWordByValue("Haus")).rejects.toThrow(
+    await expect(getDetailsByValue("Haus")).rejects.toThrow(
       "Word 'Haus' not found",
     );
   });
