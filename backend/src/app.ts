@@ -45,7 +45,7 @@ export const createApp = () => {
 
   app.use("/api/docs", docsRouter);
   app.use("/api/me", meRouter);
-  app.use("/api/words", wordsRouter);
+  app.use("/api/allWords", wordsRouter);
   app.use("/api/auth", authRouter);
 
   // If any other URL is requested, return a 404 error because the only routes in this application are the ones listed
@@ -58,7 +58,7 @@ export const createApp = () => {
   app.use(
     (error: unknown, _req: Request, res: Response, _next: NextFunction) => {
       void _next; // _next is not used, but Express requires it in this for it to be considered as middleware
-
+      void _req;
       if (
         error instanceof Error &&
         error.message === CORS_BLOCKED_ERROR_MESSAGE

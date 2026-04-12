@@ -11,9 +11,9 @@ import type { TableComponents } from "react-virtuoso";
 import { TableVirtuoso } from "react-virtuoso";
 import { useEffect } from "react";
 import type { WordSuccessResponse } from "../../api/getWords";
-import { getWords } from "../../api/getWords";
 import { Box, Checkbox, CircularProgress, Typography } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
+import { getAllWords } from "../../api/getWords";
 
 interface Data {
   id: number;
@@ -274,7 +274,7 @@ export const WordsTable = () => {
   const getData = async () => {
     try {
       setIsFetching(true);
-      const apiResult = await getWords();
+      const apiResult = await getAllWords();
       const nextRows = apiResult.map((word: WordSuccessResponse): Data => {
         return {
           id: word.id,
@@ -319,15 +319,13 @@ export const WordsTable = () => {
             onSelectAllClick={handleSelectAllClick}
           />
         )}
-        itemContent={(_index, row) =>
-          (
-            <RowContent
-              row={row}
-              isSelected={selectedIds.has(row.id)}
-              onToggleRow={handleToggleRow}
-            />
-          )
-        }
+        itemContent={(_index, row) => (
+          <RowContent
+            row={row}
+            isSelected={selectedIds.has(row.id)}
+            onToggleRow={handleToggleRow}
+          />
+        )}
       />
     </Paper>
   );

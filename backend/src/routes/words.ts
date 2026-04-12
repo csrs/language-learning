@@ -45,10 +45,6 @@ interface WordDetailsResponse {
   meanings: WordDetailsMeaningResponse[];
 }
 
-const getWordsQuerySchema = z.object({
-  numOfWords: z.string().optional(),
-});
-
 const getWordByValueRequestSchema = z.object({
   value: z.string().trim().min(1, { error: "Must be at least one character" }),
   language: z.enum(["de", "en"]),
@@ -409,18 +405,9 @@ router.get("/:value", async (req, res) => {
   }
 });
 
-// GET /api/words?numOfWords=10
-// if numOfWords is not provided, returns all words in German
-router.get("/", async (req, res) => {
-  const parseResult = getWordsQuerySchema.safeParse(req.query);
-  if (!parseResult.success) {
-    const flattenedError = z.flattenError(parseResult.error);
-    return res.status(400).json({
-      formErrors: flattenedError.formErrors,
-      fieldErrors: flattenedError.fieldErrors,
-    });
-  }
-  const { numOfWords } = parseResult.data;
+// GET /api/allWords
+router.get("/", async (_req, res) => {
+  void _req;
   try {
     const lang: Language | null = await prisma.language.findUnique({
       where: { value: "de" },
@@ -433,8 +420,7 @@ router.get("/", async (req, res) => {
 
     const words = await prisma.word.findMany({
       where: { languageId: lang.id },
-      ...(numOfWords ? { take: Number(numOfWords) } : {}),
-      orderBy: { id: "asc" },
+      orderBy: { frequencyRank: "asc" },
       select: wordListSelect,
     });
 

@@ -203,7 +203,7 @@ describe("POST /api/auth/register", () => {
 
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({
-      error: "A user with that username already exists",
+      error: "Username or email already exists",
     });
   });
 
@@ -224,7 +224,7 @@ describe("POST /api/auth/register", () => {
 
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({
-      error: "A user with that email already exists",
+      error: "Username or email already exists",
     });
   });
 
@@ -654,7 +654,7 @@ describe("API docs", () => {
       const json = await response.json();
 
       expect(json.openapi).toBe("3.0.3");
-      expect(json.paths["/api/words"]).toBeDefined();
+      expect(json.paths["/api/allWords"]).toBeDefined();
       expect(json.paths["/api/words/{value}"]).toBeDefined();
       expect(json.paths["/api/auth/login"]).toBeDefined();
     } finally {

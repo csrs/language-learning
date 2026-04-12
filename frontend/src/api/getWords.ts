@@ -49,14 +49,11 @@ export interface WordDetailsResponse {
 
 export type WordLookupLanguage = "de" | "en";
 
-export const getWords = async (
-  numOfWords?: string,
-): Promise<WordSuccessResponse[]> => {
+export const getAllWords = async (): Promise<WordSuccessResponse[]> => {
   const params = new URLSearchParams({
-    ...(numOfWords ? { numOfWords } : {}),
     language: "de",
   });
-  const response = await fetch(`/api/words?${params.toString()}`);
+  const response = await fetch(`/api/allWords?${params.toString()}`);
   if (!response.ok) {
     const body: { error?: string } | null = await response
       .json()

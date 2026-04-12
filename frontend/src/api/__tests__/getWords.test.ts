@@ -1,13 +1,13 @@
-import { getWordByValue, getWords } from "../getWords";
 import { afterEach } from "vitest";
 import type { WordDetailsResponse } from "../getWords";
+import { getAllWords, getWordByValue } from "../getWords";
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("getWords", () => {
-  it("calls fetch with correct URL and params", async () => {
+describe("getAllWords", () => {
+  it("calls fetch with correct URL and param", async () => {
     const mockWords = [{ id: 1, value: "Haus" }];
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
@@ -15,11 +15,9 @@ describe("getWords", () => {
         new Response(JSON.stringify(mockWords), { status: 200 }),
       );
 
-    const result = await getWords("5");
+    const result = await getAllWords();
 
-    expect(fetchSpy).toHaveBeenCalledWith(
-      "/api/words?numOfWords=5&language=de",
-    );
+    expect(fetchSpy).toHaveBeenCalledWith("/api/allWords?language=de");
     expect(result).toEqual(mockWords);
   });
 
@@ -28,7 +26,7 @@ describe("getWords", () => {
       new Response(null, { status: 400 }),
     );
 
-    await expect(getWords("5")).rejects.toThrow("Failed to fetch words");
+    await expect(getAllWords()).rejects.toThrow("Failed to fetch words");
   });
 });
 

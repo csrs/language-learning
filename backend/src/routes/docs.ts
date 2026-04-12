@@ -479,7 +479,7 @@ export const createOpenApiDocument = () => {
               content: jsonContent(schemaRef("ValidationErrorResponse")),
             },
             "401": {
-              description: "No valid session",
+              description: "Not authenticated",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
             "500": {
@@ -497,7 +497,7 @@ export const createOpenApiDocument = () => {
               description: "User deleted",
             },
             "401": {
-              description: "No valid session",
+              description: "Not authenticated",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
             "500": {
@@ -526,7 +526,7 @@ export const createOpenApiDocument = () => {
               content: jsonContent(schemaRef("ValidationErrorResponse")),
             },
             "401": {
-              description: "No valid session",
+              description: "Not authenticated",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
             "500": {
@@ -536,24 +536,11 @@ export const createOpenApiDocument = () => {
           },
         },
       },
-      "/api/words": {
+      "/api/allWords": {
         get: {
           tags: ["Words"],
-          summary: "List words for the German language",
-          parameters: [
-            {
-              name: "numOfWords",
-              in: "query",
-              required: false,
-              description:
-                "Maximum number of words to return. Leave empty to return all words",
-              schema: {
-                type: "integer",
-                minimum: 1,
-                example: 10,
-              },
-            },
-          ],
+          summary:
+            "List all available words in the German language. NOTE: this endpoint takes a long time now ! Fix --> https://github.com/csrs/language-learning/issues/39",
           responses: {
             "200": {
               description: "List of words",
@@ -567,13 +554,8 @@ export const createOpenApiDocument = () => {
               },
             },
             "400": {
-              description: "Invalid query parameters",
-              content: jsonContent({
-                oneOf: [
-                  schemaRef("ValidationErrorResponse"),
-                  schemaRef("ErrorResponse"),
-                ],
-              }),
+              description: "Language not found in database",
+              content: jsonContent(schemaRef("ErrorResponse")),
             },
             "500": {
               description: "Internal server error",
