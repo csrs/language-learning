@@ -1,19 +1,27 @@
+### Swagger Docs
+
+https://language-learning-krm7.onrender.com/api/doc
+
 ### How to run the frontend
 
 1. `cd frontend`
 2. `npm run dev`
 
+### API docs
+
+- Swagger Docs are available at (locally) `http://localhost:3000/api/docs` and the `<RENDER_URL>/api/docs`
+
 ### How to connect to the DB in Docker
 
 1. `cd backend`
 2. `docker compose up db backend`
-3. Go to the DB tab in VSCode and connect with these credentials:
+3. Go to the PostgreSQL Extension DB tab in VSCode and connect with these credentials:
 
 - Port: 5435
 - Host: localhost
-- Username: see `.env` file
-- Password: see `.env` file
-- Database: see `.env` file
+- Username: see `backend/.env` file
+- Password: see `backend/.env` file
+- Database: see `backend/.env` file
 
 ### How to run a DB migration
 

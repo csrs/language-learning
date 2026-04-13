@@ -55,3 +55,8 @@ export const changePasswordSchema = z
     password: z.string().min(8, { error: "Must be at least 8 characters" }),
   })
   .strict();
+
+export const getDetailsByValueRequestSchema = z.object({
+  value: z.string().trim().min(1, { error: "Must be at least one character" }),
+  language: z.enum(["de", "en"]),
+});
