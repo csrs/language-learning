@@ -189,7 +189,7 @@ const getGermanWordDetailsBySearchValue = async (
     );
 
     if (filteredWordData.length > 0) {
-      return sortWordDetailMatches(filteredWordData);
+      return filteredWordData;
     }
   }
 
@@ -339,23 +339,23 @@ const mapEnglishMatchesToGermanWordDetails = (
 // GET /api/words/all
 router.get("/all", async (_req, res) => {
   void _req;
-  try {
-    const lang: Language | null = await prisma.language.findUnique({
-      where: { value: "de" },
-    });
-    if (!lang) {
-      return res
-        .status(500)
-        .json({ error: `Language 'de' not found in database` });
-    }
+  const lang: Language | null = await prisma.language.findUnique({
+    where: { value: "de" },
+  });
+  if (!lang) {
+    return res
+      .status(500)
+      .json({ error: `Language 'de' not found in database` });
+  }
 
-    const words = await prisma.word.findMany({
-      where: { languageId: lang.id },
-      orderBy: { frequencyRank: "asc" },
-      select: wordListSelect,
-    });
+  const words = await prisma.word.findMany({
+    where: { languageId: lang.id },
+    orderBy: { frequencyRank: "asc" },
+    select: wordListSelect,
+  });
 
-    const response = words.map((word) => {
+  return res.json(
+    words.map((word) => {
       const firstMeaning = word.meanings[0];
       const firstTranslation = firstMeaning?.translations[0];
 
@@ -369,12 +369,8 @@ router.get("/all", async (_req, res) => {
         exampleBase: firstMeaning?.exampleBase ?? null,
         exampleTarget: firstMeaning?.exampleTarget ?? null,
       };
-    });
-
-    return res.json(response);
-  } catch {
-    return res.status(500).json({ error: "Internal server error" });
-  }
+    }),
+  );
 });
 
 // GET /api/words?word={word}&language=de|en
@@ -395,30 +391,28 @@ router.get("/", async (req, res) => {
   const { word, language } = parseResult.data;
   const searchValue = word.trim();
 
-  try {
-    const searchLanguage = await getLanguageByValue(language);
+  const searchLanguage = await getLanguageByValue(language);
 
-    if (!searchLanguage) {
-      return res
-        .status(400)
-        .json({ error: `Language '${language}' not found in database` });
+  if (!searchLanguage) {
+    return res
+      .status(400)
+      .json({ error: `Language '${language}' not found in database` });
+  }
+
+  if (language === "de") {
+    const germanMatches = await getGermanWordDetailsBySearchValue(
+      searchLanguage.id,
+      searchValue,
+    );
+
+    if (germanMatches.length === 0) {
+      return res.status(404).json({
+        error: `Word matching '${searchValue}' not found for language '${language}'`,
+      });
     }
 
-    if (language === "de") {
-      const germanMatches = await getGermanWordDetailsBySearchValue(
-        searchLanguage.id,
-        searchValue,
-      );
-
-      if (germanMatches.length === 0) {
-        return res.status(404).json({
-          error: `Word matching '${searchValue}' not found for language '${language}'`,
-        });
-      }
-
-      return res.json(germanMatches);
-    }
-
+    return res.json(germanMatches);
+  } else {
     const germanLanguage = await getLanguageByValue("de");
 
     if (!germanLanguage) {
@@ -441,7 +435,5 @@ router.get("/", async (req, res) => {
     }
 
     return res.json(germanMatches);
-  } catch {
-    return res.status(500).json({ error: "Internal server error" });
   }
 });

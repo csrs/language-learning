@@ -19,9 +19,9 @@ https://language-learning-krm7.onrender.com/api/doc
 
 - Port: 5435
 - Host: localhost
-- Username: see `.env` file
-- Password: see `.env` file
-- Database: see `.env` file
+- Username: see `backend/.env` file
+- Password: see `backend/.env` file
+- Database: see `backend/.env` file
 
 ### How to run a DB migration
 

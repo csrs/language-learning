@@ -4,88 +4,110 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import InputAdornment from "@mui/material/InputAdornment";
-
 import Typography from "@mui/material/Typography";
-import { useAuth } from "../../context/AuthContext";
-import { loginSchema } from "../../validation/schemas";
+import Stack from "@mui/material/Stack";
+import type { SxProps, Theme } from "@mui/material/styles";
 import { IconButton } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { changePassword } from "../../api/changePassword";
+import { changePasswordSchema } from "../../validation/schemas";
 import z from "zod";
-import { SharedFormPaper } from "../../components/SharedFormPaper/SharedFormPaper";
+import {
+  SharedFormPaper,
+  sharedFormErrorSx,
+  sharedFormFieldSx,
+  sharedSubmitButtonSx,
+} from "../SharedFormPaper/SharedFormPaper";
 
-export const Login = () => {
-  const [username, setUsername] = useState("");
+interface ChangePasswordProps {
+  sx?: SxProps<Theme>;
+}
+
+export const ChangePassword = ({ sx }: ChangePasswordProps) => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [usernameError, setUsernameError] = useState<string | undefined>(undefined);
-  const [passwordError, setPasswordError] = useState<string | undefined>(undefined);
+  const [passwordError, setPasswordError] = useState<string | undefined>(
+    undefined,
+  );
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [shouldShowPassword, setShouldShowPassword] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const parsedInput = loginSchema.safeParse({ username, password });
+  const parsedInput = changePasswordSchema.safeParse({ password });
   const isSubmitButtonEnabled = parsedInput.success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setUsernameError(undefined);
     setPasswordError(undefined);
     setFormError(undefined);
 
     if (!parsedInput.success) {
       const flattenedError = z.flattenError(parsedInput.error);
-      setUsernameError(flattenedError.fieldErrors.username?.[0]);
       setPasswordError(flattenedError.fieldErrors.password?.[0]);
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await login(username.trim(), password.trim());
+      await changePassword(password);
       navigate("/");
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Login failed");
+      setFormError(
+        err instanceof Error ? err.message : "Password change failed",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
-    <SharedFormPaper>
-      <Typography variant="h5" align="center" gutterBottom>
-        Login
-      </Typography>
+    <SharedFormPaper maxWidth={520} sx={sx}>
+      <Stack spacing={1} sx={{ mb: 3, textAlign: "center" }}>
+        <Typography
+          variant="overline"
+          sx={{ color: "success.dark", fontWeight: 700, letterSpacing: 1.1 }}
+        >
+          Security
+        </Typography>
+        <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
+          Change password
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            lineHeight: 1.6,
+            maxWidth: 340,
+            mx: "auto",
+          }}
+        >
+          Choose a new password with at least 8 characters to keep your account
+          secure.
+        </Typography>
+      </Stack>
       <Box
         component="form"
         onSubmit={handleSubmit}
-        sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%" }}
+        sx={{ display: "flex", flexDirection: "column", gap: 2.25 }}
       >
         {formError && (
-          <Typography color="error" variant="body2">
-            {formError}
-          </Typography>
+          <Box sx={sharedFormErrorSx}>
+            <Typography color="error" variant="body2">
+              {formError}
+            </Typography>
+          </Box>
         )}
-        <TextField
-          label="Username"
-          type="text"
-          required
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          disabled={isSubmitting}
-          error={!!usernameError}
-          helperText={usernameError}
-        />
         <TextField
           label="Password"
           type={shouldShowPassword ? "text" : "password"}
           required
+          fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
           error={!!passwordError}
-          helperText={passwordError}
+          helperText={passwordError || "Password must be at least 8 characters"}
+          sx={sharedFormFieldSx}
           slotProps={{
             input: {
               endAdornment: (
@@ -100,6 +122,7 @@ export const Login = () => {
                     onMouseDown={(e) => e.preventDefault()}
                     onMouseUp={(e) => e.preventDefault()}
                     edge="end"
+                    sx={{ color: "text.secondary" }}
                   >
                     {shouldShowPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
@@ -111,9 +134,11 @@ export const Login = () => {
         <Button
           type="submit"
           variant="contained"
+          fullWidth
           disabled={!isSubmitButtonEnabled || isSubmitting}
+          sx={sharedSubmitButtonSx}
         >
-          {isSubmitting ? "Logging in..." : "Login"}
+          {isSubmitting ? "Updating..." : "Change password"}
         </Button>
       </Box>
     </SharedFormPaper>
