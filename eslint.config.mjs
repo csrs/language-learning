@@ -10,6 +10,8 @@ export default defineConfig(
     ignores: [
       "*/dist/**/*",
       "frontend/public/**/*",
+      "frontend/src/api/generated/endpoints/**/*.ts",
+      "frontend/src/api/generated/types/**/*.ts",
       "frontend/node_modules/**/*",
       "backend/node_modules/**/*",
       "*.js",
