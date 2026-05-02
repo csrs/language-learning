@@ -7,9 +7,9 @@ import {
 } from "react";
 import { login as loginApi } from "../api/login";
 import { logout as logoutApi } from "../api/logout";
-import { register as registerApi } from "../api/register";
 import { getCurrentUser } from "../api/getCurrentUser";
 import { type User } from "../types/auth.types";
+import { registerUser } from "../api/generated/endpoints/auth/auth";
 
 interface AuthContextValue {
   user: User | null;
@@ -52,7 +52,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     password: string,
   ) => {
-    await registerApi(username, email, password);
+    // await registerApi(username, email, password);
+    await registerUser({ username, email, password });
   };
 
   const logout = async () => {

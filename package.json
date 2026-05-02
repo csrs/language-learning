@@ -10,6 +10,7 @@
     "type-check:backend": "npm --prefix backend run type-check",
     "type-check:frontend": "npm --prefix frontend run type-check",
     "type-check": "npm run type-check:backend && npm run type-check:frontend",
+    "api:generate": "npm --prefix frontend run api:generate",
     "install:all": "cd frontend && npm install && cd ../backend && npm install",
     "test:frontend": "cd frontend && npm run test",
     "test:backend": "cd backend && npm run test",

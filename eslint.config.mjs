@@ -13,6 +13,8 @@ export default defineConfig(
       "frontend/node_modules/**/*",
       "backend/node_modules/**/*",
       "*.js",
+      "**/*.config.ts",
+      "**/*.config.mjs",
     ],
   },
 

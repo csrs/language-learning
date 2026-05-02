@@ -7,9 +7,8 @@ export const Home = () => {
   return (
     <Box
       sx={{
-        mt: { xs: 2, md: 4 },
-        px: { xs: 2, sm: 4, md: 6 },
-        py: { xs: 5, sm: 6, md: 8 },
+        px: { xs: 2.25, sm: 3.5 },
+        py: { xs: 2.5, sm: 3.75 },
         borderRadius: { xs: 4, sm: 6 },
         background:
           "radial-gradient(circle at top left, rgba(46, 125, 50, 0.18), transparent 35%), linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(232, 245, 233, 0.9) 45%, rgba(227, 242, 253, 0.95) 100%)",
@@ -61,23 +60,6 @@ export const Home = () => {
           Practice with natural paragraphs, discover word meanings as you go,
           and track the vocabulary you truly understand.
         </Typography>
-
-        <Box
-          sx={{
-            maxWidth: 560,
-            px: { xs: 2, sm: 2.5 },
-            py: 1.5,
-            borderRadius: 3,
-            backgroundColor: "rgba(255, 255, 255, 0.7)",
-            border: "1px solid rgba(15, 23, 42, 0.08)",
-            backdropFilter: "blur(8px)",
-          }}
-        >
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            Work in progress: account registration and authentication are not
-            yet connected to the language-learning experience.
-          </Typography>
-        </Box>
       </Stack>
     </Box>
   );

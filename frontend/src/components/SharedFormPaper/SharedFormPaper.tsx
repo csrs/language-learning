@@ -78,10 +78,9 @@ export const SharedFormPaper = ({
           overflow: "hidden",
           maxWidth,
           mx: "auto",
-          mt: { xs: 0, sm: 4 },
           px: { xs: 2.25, sm: 3.5 },
           py: { xs: 2.5, sm: 3.75 },
-          borderRadius: { xs: 0, sm: 5 },
+          borderRadius: 5,
           border: "1px solid rgba(15, 23, 42, 0.08)",
           background:
             "linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.78) 100%), radial-gradient(circle at top right, rgba(46, 125, 50, 0.14), transparent 36%), radial-gradient(circle at bottom left, rgba(33, 150, 243, 0.08), transparent 30%)",

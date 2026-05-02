@@ -5,13 +5,17 @@ import { Header } from "../Header/Header";
 
 export const Layout = () => {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
       <Header />
       <Container
         component="main"
         disableGutters
-        sx={{ flex: 1, py: 2, px: { xs: 0, sm: 3 } }}
         maxWidth="lg"
+        sx={{
+          mt: { xs: 0, sm: 1 },
+          px: { xs: 2.25, sm: 3.5 },
+          py: { xs: 2.5, sm: 3.75 },
+        }}
       >
         <Outlet />
       </Container>

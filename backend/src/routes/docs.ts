@@ -370,6 +370,7 @@ export const createOpenApiDocument = () => {
     paths: {
       "/api/auth/register": {
         post: {
+          operationId: "registerUser",
           tags: ["Auth"],
           summary: "Register a new user",
           requestBody: {
@@ -398,6 +399,7 @@ export const createOpenApiDocument = () => {
       },
       "/api/auth/login": {
         post: {
+          operationId: "loginUser",
           tags: ["Auth"],
           summary: "Log in and create a session",
           requestBody: {
@@ -426,6 +428,7 @@ export const createOpenApiDocument = () => {
       },
       "/api/auth/logout": {
         post: {
+          operationId: "logoutUser",
           tags: ["Auth"],
           summary:
             "Log out the current authenticated user and delete the session cookie",
@@ -443,6 +446,7 @@ export const createOpenApiDocument = () => {
       },
       "/api/me": {
         get: {
+          operationId: "getCurrentUser",
           tags: ["Me"],
           summary: "Get the current authenticated user",
           security: [{ sessionCookie: [] }],
@@ -462,6 +466,7 @@ export const createOpenApiDocument = () => {
           },
         },
         patch: {
+          operationId: "updateCurrentUser",
           tags: ["Me"],
           summary: "Update the current user's username or email",
           security: [{ sessionCookie: [] }],
@@ -489,6 +494,7 @@ export const createOpenApiDocument = () => {
           },
         },
         delete: {
+          operationId: "deleteCurrentUser",
           tags: ["Me"],
           summary: "Delete the current user",
           security: [{ sessionCookie: [] }],
@@ -509,6 +515,7 @@ export const createOpenApiDocument = () => {
       },
       "/api/me/password": {
         patch: {
+          operationId: "updateCurrentUserPassword",
           tags: ["Me"],
           summary: "Update the current user's password",
           security: [{ sessionCookie: [] }],
@@ -538,6 +545,7 @@ export const createOpenApiDocument = () => {
       },
       "/api/words/all": {
         get: {
+          operationId: "getAllWords",
           tags: ["Words"],
           summary:
             "List all available words in the German language. NOTE: this endpoint takes a long time now ! Fix --> https://github.com/csrs/language-learning/issues/39",
@@ -562,6 +570,7 @@ export const createOpenApiDocument = () => {
       },
       "/api/words": {
         get: {
+          operationId: "getWordDetails",
           tags: ["Words"],
           summary:
             "Get translation word matches and details from a German or English input word",

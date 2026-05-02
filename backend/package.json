@@ -8,6 +8,7 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "start": "tsx src/server.ts",
+    "openapi:generate": "tsx src/scripts/openapi/generateOpenApiDocument.ts",
     "build": "tsc -p tsconfig.build.json",
     "build:watch": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
     "dev:docker": "tsx watch src/server.ts",
