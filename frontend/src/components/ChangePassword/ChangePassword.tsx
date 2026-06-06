@@ -10,7 +10,6 @@ import type { SxProps, Theme } from "@mui/material/styles";
 import { IconButton } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { changePassword } from "../../api/changePassword";
 import { changePasswordSchema } from "../../validation/schemas";
 import z from "zod";
 import {
@@ -19,6 +18,7 @@ import {
   sharedFormFieldSx,
   sharedSubmitButtonSx,
 } from "../SharedFormPaper/SharedFormPaper";
+import { updateCurrentUserPassword } from "../../api/generated/endpoints/me/me";
 
 interface ChangePasswordProps {
   sx?: SxProps<Theme>;
@@ -50,7 +50,7 @@ export const ChangePassword = ({ sx }: ChangePasswordProps) => {
 
     setIsSubmitting(true);
     try {
-      await changePassword(password);
+      await updateCurrentUserPassword({ password });
       navigate("/");
     } catch (err) {
       setFormError(

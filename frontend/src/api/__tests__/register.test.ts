@@ -1,4 +1,4 @@
-import { register } from "../register";
+import { registerUser } from "../generated/endpoints/auth/auth";
 
 const mockResponseBody = {
   id: 1,
@@ -14,7 +14,11 @@ describe("register", () => {
         new Response(JSON.stringify(mockResponseBody), { status: 201 }),
       );
 
-    const result = await register("alice", "alice@example.com", "secret123");
+    const result = await registerUser({
+      username: "alice",
+      email: "alice@example.com",
+      password: "secret123",
+    });
 
     expect(fetchSpy).toHaveBeenCalledWith("/api/auth/register", {
       method: "POST",
@@ -25,7 +29,11 @@ describe("register", () => {
         password: "secret123",
       }),
     });
-    expect(result).toEqual(mockResponseBody);
+    expect(result).toEqual({
+      data: mockResponseBody,
+      status: 201,
+      headers: expect.any(Headers),
+    });
   });
 
   it("throws when the response is not ok", async () => {
@@ -34,7 +42,11 @@ describe("register", () => {
     );
 
     await expect(
-      register("alice", "alice@example.com", "short"),
-    ).rejects.toThrow("Failed to register user");
+      registerUser({
+        username: "alice",
+        email: "alice@example.com",
+        password: "short",
+      }),
+    ).rejects.toThrow("Request failed with status 400");
   });
 });

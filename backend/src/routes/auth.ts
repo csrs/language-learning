@@ -111,9 +111,9 @@ router.post("/login", async (req, res) => {
     });
   }
 
-  const passwordStatus = await getIsPasswordValid(password, user.passwordHash);
+  const isPasswordValid = await getIsPasswordValid(password, user.passwordHash);
 
-  if (!passwordStatus) {
+  if (!isPasswordValid) {
     return res.status(401).json({
       error: "Username and/or password are incorrect.",
     });

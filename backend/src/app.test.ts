@@ -513,6 +513,47 @@ describe("me routes", () => {
     });
   });
 
+  it("returns 409 for PATCH /api/me when username or email belongs to another user", async () => {
+    prismaMock.session.findUnique.mockResolvedValueOnce({
+      userId: 7,
+      expiresAt: new Date(Date.now() + 60_000),
+    } as never);
+    prismaMock.user.update.mockRejectedValueOnce(
+      new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
+        code: "P2002",
+        clientVersion: "test",
+        meta: { target: ["email"] },
+      }),
+    );
+
+    const response = await fetch(`${baseUrl}/api/me`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: `${SESSION_COOKIE_NAME}=session-token`,
+      },
+      body: JSON.stringify({
+        email: "taken@example.com",
+      }),
+    });
+
+    expect(response.status).toBe(409);
+    await expect(response.json()).resolves.toEqual({
+      error: "Username or email is already assigned to a different user",
+    });
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: 7 },
+      data: {
+        email: "taken@example.com",
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
+    });
+  });
+
   it("returns 400 for PATCH /api/me when no fields are provided", async () => {
     const response = await fetch(`${baseUrl}/api/me`, {
       method: "PATCH",

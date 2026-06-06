@@ -1,4 +1,4 @@
-type RequestMethod = "get" | "put" | "patch" | "post" | "delete";
+type RequestMethod = "get" | "patch" | "post" | "delete";
 
 export interface RequestConfig<Data = unknown> {
   url: string;

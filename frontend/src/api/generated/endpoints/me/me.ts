@@ -80,6 +80,11 @@ export type updateCurrentUserResponse401 = {
   status: 401
 }
 
+export type updateCurrentUserResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
 export type updateCurrentUserResponse500 = {
   data: ErrorResponse
   status: 500
@@ -88,7 +93,7 @@ export type updateCurrentUserResponse500 = {
 export type updateCurrentUserResponseSuccess = (updateCurrentUserResponse200) & {
   headers: Headers;
 };
-export type updateCurrentUserResponseError = (updateCurrentUserResponse400 | updateCurrentUserResponse401 | updateCurrentUserResponse500) & {
+export type updateCurrentUserResponseError = (updateCurrentUserResponse400 | updateCurrentUserResponse401 | updateCurrentUserResponse409 | updateCurrentUserResponse500) & {
   headers: Headers;
 };
 

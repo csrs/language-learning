@@ -33,7 +33,7 @@ export const Login = () => {
   const navigate = useNavigate();
 
   const parsedInput = loginSchema.safeParse({ username, password });
-  // const isSubmitButtonEnabled = parsedInput.success;
+  const isSubmitButtonEnabled = parsedInput.success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -153,8 +153,7 @@ export const Login = () => {
           type="submit"
           variant="contained"
           fullWidth
-          // disabled={!isSubmitButtonEnabled || isSubmitting}
-          disabled
+          disabled={!isSubmitButtonEnabled || isSubmitting}
           sx={sharedSubmitButtonSx}
         >
           {isSubmitting ? "Logging in..." : "Login"}

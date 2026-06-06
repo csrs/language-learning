@@ -487,6 +487,11 @@ export const createOpenApiDocument = () => {
               description: "Not authenticated",
               content: jsonContent(schemaRef("ErrorResponse")),
             },
+            "409": {
+              description:
+                "Username or email is already assigned to a different user",
+              content: jsonContent(schemaRef("ErrorResponse")),
+            },
             "500": {
               description: "Internal server error",
               content: jsonContent(schemaRef("ErrorResponse")),

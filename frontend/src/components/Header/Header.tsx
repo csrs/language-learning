@@ -1,14 +1,22 @@
-import { Link as RouterLink, useLocation } from "react-router";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import { useAuth } from "../../context/AuthContext";
+import { Skeleton } from "@mui/material";
+import { useEffect, useState } from "react";
 
 export const Header = () => {
   const { pathname } = useLocation();
+  const { user, isLoading, logout } = useAuth();
+  const navigate = useNavigate();
 
   const isActive = (to: string) =>
     to === "/" ? pathname === "/" : pathname.startsWith(to);
+
+  const [shouldShowSkeleton, setShouldShowSkeleton] = useState(false);
 
   const getNavButtonSx = (isCurrentPage: boolean) => ({
     px: 1.75,
@@ -35,6 +43,18 @@ export const Header = () => {
         : "rgba(248, 250, 252, 0.96)",
     },
   });
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    if (isLoading) {
+      timer = setTimeout(() => setShouldShowSkeleton(true), 6);
+    } else {
+      setShouldShowSkeleton(false);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isLoading]);
 
   return (
     <AppBar
@@ -89,6 +109,123 @@ export const Header = () => {
             About
           </Button>
         </Box>
+
+        {!user && (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              alignItems: "center",
+              justifyContent: { xs: "center", sm: "flex-end" },
+              width: { xs: "100%", sm: "auto" },
+              ml: { sm: "auto" },
+            }}
+          >
+            {isLoading && shouldShowSkeleton ? (
+              <>
+                <Skeleton
+                  variant="rounded"
+                  width={100}
+                  height={40}
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.08)", borderRadius: 999 }}
+                />
+                <Skeleton
+                  variant="rounded"
+                  width={96}
+                  height={40}
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.08)", borderRadius: 999 }}
+                />
+              </>
+            ) : (
+              <>
+                <Button
+                  component={RouterLink}
+                  to="/register"
+                  variant="text"
+                  sx={getNavButtonSx(isActive("/register"))}
+                >
+                  Register
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to="/login"
+                  variant="text"
+                  sx={getNavButtonSx(isActive("/login"))}
+                >
+                  Login
+                </Button>
+              </>
+            )}
+          </Box>
+        )}
+
+        {user && (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              alignItems: "center",
+              justifyContent: { xs: "center", sm: "flex-end" },
+              width: { xs: "100%", sm: "auto" },
+              ml: { sm: "auto" },
+            }}
+          >
+            {isLoading && shouldShowSkeleton ? (
+              <>
+                <Skeleton
+                  variant="rounded"
+                  width={126}
+                  height={40}
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.08)", borderRadius: 999 }}
+                />
+                <Skeleton
+                  variant="rounded"
+                  width={150}
+                  height={24}
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.08)", borderRadius: 999 }}
+                />
+                <Skeleton
+                  variant="rounded"
+                  width={96}
+                  height={40}
+                  sx={{ bgcolor: "rgba(15, 23, 42, 0.08)", borderRadius: 999 }}
+                />
+              </>
+            ) : (
+              <>
+                <Typography
+                  sx={{
+                    px: 0.5,
+                    color: "text.secondary",
+                    fontWeight: 500,
+                  }}
+                >
+                  {`Hello, ${user.username}!`}
+                </Typography>
+                <Button
+                  component={RouterLink}
+                  to="/edit-profile"
+                  variant="text"
+                  sx={getNavButtonSx(isActive("/edit-profile"))}
+                >
+                  Edit Profile
+                </Button>
+                <Button
+                  variant="text"
+                  sx={getNavButtonSx(false)}
+                  onClick={async () => {
+                    await logout();
+                    navigate("/");
+                  }}
+                >
+                  Logout
+                </Button>
+              </>
+            )}
+          </Box>
+        )}
       </Toolbar>
     </AppBar>
   );

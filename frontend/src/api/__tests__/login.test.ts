@@ -1,6 +1,6 @@
-import { login } from "../login";
+import { loginUser } from "../generated/endpoints/auth/auth";
 
-const mockResponseBody = { id: 1, username: "alice" };
+const mockResponseBody = { id: 1, username: "alice", email: "a@test.com" };
 
 describe("login", () => {
   it("sends a POST request with username and password", async () => {
@@ -10,7 +10,10 @@ describe("login", () => {
         new Response(JSON.stringify(mockResponseBody), { status: 200 }),
       );
 
-    const result = await login("alice", "secret123");
+    const result = await loginUser({
+      username: "alice",
+      password: "secret123",
+    });
 
     expect(fetchSpy).toHaveBeenCalledWith("/api/auth/login", {
       method: "POST",
@@ -20,7 +23,11 @@ describe("login", () => {
         password: "secret123",
       }),
     });
-    expect(result).toEqual(mockResponseBody);
+    expect(result).toEqual({
+      data: mockResponseBody,
+      status: 200,
+      headers: expect.any(Headers),
+    });
   });
 
   it("throws when the response is not ok", async () => {
@@ -28,8 +35,8 @@ describe("login", () => {
       new Response(null, { status: 401 }),
     );
 
-    await expect(login("alice", "wrong")).rejects.toThrow(
-      "Failed to login user",
-    );
+    await expect(
+      loginUser({ username: "alice", password: "wrong" }),
+    ).rejects.toThrow("Request failed with status 401");
   });
 });
