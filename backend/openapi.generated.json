@@ -1,0 +1,898 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Language Learning API",
+    "version": "1.0.0",
+    "description": "Interactive API documentation for the auth, profile, and words endpoints."
+  },
+  "servers": [
+    {
+      "url": "https://language-learning-krm7.onrender.com",
+      "description": "Render deployment"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Account registration, login, and logout"
+    },
+    {
+      "name": "Me",
+      "description": "Authenticated user profile endpoints"
+    },
+    {
+      "name": "Words",
+      "description": "Word list lookup endpoints"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sessionId",
+        "description": "Session cookie returned by the login endpoint."
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "username",
+          "email"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 7
+          },
+          "username": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 20,
+            "example": "Ada"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "ada@example.com"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "username",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 20,
+            "example": "Ada"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "ada@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "example": "super-secret"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 20,
+            "example": "Ada"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "example": "super-secret"
+          }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 20,
+            "example": "NewAda"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "new@example.com"
+          }
+        }
+      },
+      "UpdatePasswordRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "password"
+        ],
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "example": "new-password"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "formErrors",
+          "fieldErrors"
+        ],
+        "properties": {
+          "formErrors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": []
+          },
+          "fieldErrors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": {
+              "password": [
+                "Must be at least 8 characters"
+              ]
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Internal server error"
+          }
+        }
+      },
+      "WordListItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "value",
+          "languageId",
+          "frequencyRank",
+          "partOfSpeech",
+          "translation",
+          "exampleBase",
+          "exampleTarget"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "value": {
+            "type": "string",
+            "example": "Haus"
+          },
+          "languageId": {
+            "type": "integer",
+            "example": 2
+          },
+          "frequencyRank": {
+            "type": "integer",
+            "nullable": true,
+            "example": 15
+          },
+          "partOfSpeech": {
+            "type": "string",
+            "nullable": true,
+            "example": "noun"
+          },
+          "translation": {
+            "type": "string",
+            "nullable": true,
+            "example": "house"
+          },
+          "exampleBase": {
+            "type": "string",
+            "nullable": true,
+            "example": "Das Haus ist groB."
+          },
+          "exampleTarget": {
+            "type": "string",
+            "nullable": true,
+            "example": "The house is big."
+          }
+        }
+      },
+      "WordLanguage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "value"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "value": {
+            "type": "string",
+            "example": "de"
+          }
+        }
+      },
+      "WordPartOfSpeech": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "value"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 3
+          },
+          "value": {
+            "type": "string",
+            "example": "noun"
+          }
+        }
+      },
+      "WordTranslationTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "value",
+          "frequencyRank",
+          "language"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 2
+          },
+          "value": {
+            "type": "string",
+            "example": "house"
+          },
+          "frequencyRank": {
+            "type": "integer",
+            "nullable": true,
+            "example": 5
+          },
+          "language": {
+            "$ref": "#/components/schemas/WordLanguage"
+          }
+        }
+      },
+      "WordTranslation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "toWord"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1000
+          },
+          "toWord": {
+            "$ref": "#/components/schemas/WordTranslationTarget"
+          }
+        }
+      },
+      "WordMeaning": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "exampleBase",
+          "exampleTarget",
+          "partOfSpeech",
+          "translations"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 10
+          },
+          "exampleBase": {
+            "type": "string",
+            "example": "The house is big."
+          },
+          "exampleTarget": {
+            "type": "string",
+            "example": "Das Haus ist gross."
+          },
+          "partOfSpeech": {
+            "$ref": "#/components/schemas/WordPartOfSpeech"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WordTranslation"
+            }
+          }
+        }
+      },
+      "WordDetail": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "value",
+          "frequencyRank",
+          "language",
+          "meanings"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "value": {
+            "type": "string",
+            "example": "Haus"
+          },
+          "frequencyRank": {
+            "type": "integer",
+            "nullable": true,
+            "example": 1
+          },
+          "language": {
+            "$ref": "#/components/schemas/WordLanguage"
+          },
+          "meanings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WordMeaning"
+            }
+          }
+        }
+      },
+      "WordDetailList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/WordDetail"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "operationId": "registerUser",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Username or email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "loginUser",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log in and create a session",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated user returned and session cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Username and/or password are incorrect.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Username and/or password are incorrect.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "logoutUser",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log out the current authenticated user and delete the session cookie",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Logged out successfully and deleted session cookie"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "operationId": "getCurrentUser",
+        "tags": [
+          "Me"
+        ],
+        "summary": "Get the current authenticated user",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateCurrentUser",
+        "tags": [
+          "Me"
+        ],
+        "summary": "Update the current user's username or email",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Username or email is already assigned to a different user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCurrentUser",
+        "tags": [
+          "Me"
+        ],
+        "summary": "Delete the current user",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted"
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me/password": {
+      "patch": {
+        "operationId": "updateCurrentUserPassword",
+        "tags": [
+          "Me"
+        ],
+        "summary": "Update the current user's password",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/words/all": {
+      "get": {
+        "operationId": "getAllWords",
+        "tags": [
+          "Words"
+        ],
+        "summary": "List all available words in the German language. NOTE: this endpoint takes a long time now ! Fix --> https://github.com/csrs/language-learning/issues/39",
+        "responses": {
+          "200": {
+            "description": "List of words",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WordListItem"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/words": {
+      "get": {
+        "operationId": "getWordDetails",
+        "tags": [
+          "Words"
+        ],
+        "summary": "Get translation word matches and details from a German or English input word",
+        "parameters": [
+          {
+            "name": "word",
+            "in": "query",
+            "required": true,
+            "description": "Full word (including or not including the article) to look up (e.g. 'werden', 'wird', 'Haus', 'haus', 'der', 'Frau', 'house')",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "example": "Haus"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": true,
+            "description": "Language of the search term.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "de",
+                "en"
+              ],
+              "example": "de"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Word(s) found with translation(s), part(s) of speech, and example sentence(s)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WordDetailList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters, unsupported language, or missing configured language",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationErrorResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No matches found for the requested lookup",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -36,7 +36,7 @@ export const Register = () => {
   const navigate = useNavigate();
 
   const parsedInput = registerSchema.safeParse({ username, email, password });
-  // const isSubmitButtonEnabled = parsedInput.success;
+  const isSubmitButtonEnabled = parsedInput.success;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -171,8 +171,7 @@ export const Register = () => {
           type="submit"
           variant="contained"
           fullWidth
-          // disabled={!isSubmitButtonEnabled || isSubmitting}
-          disabled
+          disabled={!isSubmitButtonEnabled || isSubmitting}
           sx={sharedSubmitButtonSx}
         >
           {isSubmitting ? "Registering..." : "Register"}

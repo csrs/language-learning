@@ -1,6 +1,9 @@
 import { afterEach } from "vitest";
-import type { WordDetailsResponse } from "../getWords";
-import { getAllWords, getDetailsByValue } from "../getWords";
+import {
+  getAllWords,
+  getWordDetails,
+} from "../generated/endpoints/words/words";
+import type { WordDetail } from "../generated/types";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -17,8 +20,14 @@ describe("getAllWords", () => {
 
     const result = await getAllWords();
 
-    expect(fetchSpy).toHaveBeenCalledWith("/api/words/all?language=de");
-    expect(result).toEqual(mockWords);
+    expect(fetchSpy).toHaveBeenCalledWith("/api/words/all", {
+      method: "GET",
+    });
+    expect(result).toEqual({
+      data: mockWords,
+      status: 200,
+      headers: expect.any(Headers),
+    });
   });
 
   it("throws when the response is not ok", async () => {
@@ -26,13 +35,15 @@ describe("getAllWords", () => {
       new Response(null, { status: 400 }),
     );
 
-    await expect(getAllWords()).rejects.toThrow("Failed to fetch words");
+    await expect(getAllWords()).rejects.toThrow(
+      "Request failed with status 400",
+    );
   });
 });
 
 describe("getDetailsByValue", () => {
   it("calls fetch with the word in the path", async () => {
-    const mockWord: WordDetailsResponse[] = [
+    const mockWord: WordDetail[] = [
       {
         id: 1,
         value: "Haus",
@@ -50,16 +61,20 @@ describe("getDetailsByValue", () => {
         new Response(JSON.stringify(mockWord), { status: 200 }),
       );
 
-    const result = await getDetailsByValue("Haus");
+    const result = await getWordDetails({ word: "Haus", language: "de" });
 
-    expect(fetchSpy).toHaveBeenCalledWith(
-      "/api/words?word=Haus&word=Haus&language=de",
-    );
-    expect(result).toEqual(mockWord);
+    expect(fetchSpy).toHaveBeenCalledWith("/api/words?word=Haus&language=de", {
+      method: "GET",
+    });
+    expect(result).toEqual({
+      data: mockWord,
+      status: 200,
+      headers: expect.any(Headers),
+    });
   });
 
   it("supports English reverse lookup and encodes the path value", async () => {
-    const mockWord: WordDetailsResponse[] = [
+    const mockWord: WordDetail[] = [
       {
         id: 1,
         value: "laufen, läuft, lief, ist gelaufen",
@@ -77,12 +92,19 @@ describe("getDetailsByValue", () => {
         new Response(JSON.stringify(mockWord), { status: 200 }),
       );
 
-    const result = await getDetailsByValue("to run", "en");
+    const result = await getWordDetails({ word: "to run", language: "en" });
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      "/api/words?word=to%20run&word=to+run&language=en",
+      "/api/words?word=to+run&language=en",
+      {
+        method: "GET",
+      },
     );
-    expect(result).toEqual(mockWord);
+    expect(result).toEqual({
+      data: mockWord,
+      status: 200,
+      headers: expect.any(Headers),
+    });
   });
 
   it("throws when fetching the word details fails", async () => {
@@ -92,8 +114,8 @@ describe("getDetailsByValue", () => {
       }),
     );
 
-    await expect(getDetailsByValue("Haus")).rejects.toThrow(
-      "Word 'Haus' not found",
-    );
+    await expect(
+      getWordDetails({ word: "Haus", language: "en" }),
+    ).rejects.toThrow("Word 'Haus' not found");
   });
 });

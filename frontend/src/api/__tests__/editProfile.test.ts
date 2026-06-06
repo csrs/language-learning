@@ -1,4 +1,4 @@
-import { editProfile } from "../editProfile";
+import { updateCurrentUser } from "../generated/endpoints/me/me";
 
 const mockResponseBody = { id: 1, username: "bob", email: "bob@example.com" };
 
@@ -10,7 +10,10 @@ describe("editProfile", () => {
         new Response(JSON.stringify(mockResponseBody), { status: 200 }),
       );
 
-    const result = await editProfile("bob", "bob@example.com");
+    const result = await updateCurrentUser({
+      username: "bob",
+      email: "bob@example.com",
+    });
 
     expect(fetchSpy).toHaveBeenCalledWith("/api/me", {
       method: "PATCH",
@@ -20,7 +23,11 @@ describe("editProfile", () => {
         email: "bob@example.com",
       }),
     });
-    expect(result).toEqual(mockResponseBody);
+    expect(result).toEqual({
+      data: mockResponseBody,
+      status: 200,
+      headers: expect.any(Headers),
+    });
   });
 
   it("throws when the response is not ok", async () => {
@@ -28,8 +35,8 @@ describe("editProfile", () => {
       new Response(null, { status: 400 }),
     );
 
-    await expect(editProfile("bob", "bad-email")).rejects.toThrow(
-      "Failed to edit profile",
-    );
+    await expect(
+      updateCurrentUser({ username: "bob", email: "bad-email" }),
+    ).rejects.toThrow("Request failed with status 400");
   });
 });

@@ -6,7 +6,6 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { ChangePassword } from "../ChangePassword/ChangePassword";
-import { editProfile } from "../../api/editProfile";
 import { editProfileSchema } from "../../validation/schemas";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -15,6 +14,7 @@ import {
   sharedFormFieldSx,
   sharedSubmitButtonSx,
 } from "../SharedFormPaper/SharedFormPaper";
+import { updateCurrentUser } from "../../api/generated/endpoints/me/me";
 
 export const EditProfile = () => {
   const { user } = useAuth();
@@ -47,7 +47,10 @@ export const EditProfile = () => {
 
     setIsSubmitting(true);
     try {
-      await editProfile(username.trim(), email.trim());
+      await updateCurrentUser({
+        username: username.trim(),
+        email: email.trim(),
+      });
       navigate("/");
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Edit profile failed");

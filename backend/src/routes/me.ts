@@ -10,6 +10,7 @@ import {
 } from "../lib/session.js";
 import z from "zod";
 import { createPasswordHash } from "../lib/password.js";
+import { Prisma } from "@prisma/client";
 
 const editUserSchema = z
   .object({
@@ -101,29 +102,32 @@ router.patch("/", async (req, res) => {
   }
   const { username, email } = parsedBody.data;
 
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data: {
-      ...(username ? { username } : {}),
-      ...(email ? { email } : {}),
-    },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-    },
-  });
-
-  if (!user) {
-    await deleteSession(sessionId);
-    res.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
-
-    return res.status(401).json({
-      error: "Not authenticated",
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(username ? { username } : {}),
+        ...(email ? { email } : {}),
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
     });
-  }
+    return res.json(user);
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return res.status(409).json({
+        error: `Username or email is already assigned to a different user`,
+      });
+    }
 
-  return res.json(user);
+    throw error;
+  }
 });
 
 router.patch("/password", async (req, res) => {

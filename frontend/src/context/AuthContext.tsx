@@ -5,11 +5,13 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-import { login as loginApi } from "../api/login";
-import { logout as logoutApi } from "../api/logout";
-import { register as registerApi } from "../api/register";
-import { getCurrentUser } from "../api/getCurrentUser";
-import { type User } from "../types/auth.types";
+import {
+  loginUser,
+  logoutUser,
+  registerUser,
+} from "../api/generated/endpoints/auth/auth";
+import { type User } from "../api/generated/types";
+import { getCurrentUser } from "../api/generated/endpoints/me/me";
 
 interface AuthContextValue {
   user: User | null;
@@ -32,8 +34,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     (async () => {
       try {
-        const me = await getCurrentUser();
-        setUser(me);
+        const response = await getCurrentUser();
+        if (response.status === 200) setUser(response.data);
       } catch {
         // Not logged in. Don't throw any error, this is perfectly fine if no user is logged in
       } finally {
@@ -43,8 +45,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (username: string, password: string) => {
-    const user = await loginApi(username, password);
-    setUser(user);
+    const response = await loginUser({ username, password });
+    if (response.status === 200) {
+      setUser(response.data);
+    }
   };
 
   const register = async (
@@ -52,12 +56,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     password: string,
   ) => {
-    await registerApi(username, email, password);
+    await registerUser({ username, email, password });
   };
 
   const logout = async () => {
-    await logoutApi();
-    setUser(null);
+    try {
+      await logoutUser();
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
